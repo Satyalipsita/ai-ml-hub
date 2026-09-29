@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI &amp; ML Learning Hub | DRIEMS Polytechnic (Autonomous)</title>
+<!--
+  ============================================================
+  SETUP (edit the CONFIG block near the bottom of this file)
+  ============================================================
+  1. LOGO_URL      -> paste the link/path of the official DRIEMS Polytechnic logo.
+  2. Theme colours -> change the CSS variables under :root (--navy, --saffron ...).
+  3. DB_ENDPOINT   -> to store sign-ups in a real database, deploy this Google Apps Script
+                      (Extensions > Apps Script in a Google Sheet, Deploy > Web app, access: Anyone)
+                      and paste the web-app URL into DB_ENDPOINT.
+
+      function doPost(e){
+        var d = JSON.parse(e.postData.contents);
+        var ss = SpreadsheetApp.getActiveSpreadsheet();
+        var sh = ss.getSheetByName(d.type) || ss.insertSheet(d.type);
+        var row = Object.keys(d.record).map(function(k){ return d.record[k]; });
+        if (sh.getLastRow() === 0) sh.appendRow(Object.keys(d.record));
+        sh.appendRow(row);
+        return ContentService.createTextOutput('ok');
+      }
+
+  (Firebase, Supabase or any REST API works too: the page POSTs JSON {type, record}.)
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A2A5E;
+  --navy-2:#153F85;
+  --saffron:#F58220;
+  --saffron-soft:#FDEBD8;
+  --paper:#F4F6FA;
+  --card:#FFFFFF;
+  --ink:#101B33;
+  --muted:#5A6580;
+  --line:#D5DBE8;
+  --ok:#1B8A5A;
+  --bad:#C6362B;
+  --head:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--body);color:var(--ink);background:var(--paper);font-size:17px;line-height:1.5}
+h1,h2,h3{font-family:var(--head);line-height:1.15;margin:0}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* header */
+header.top{background:var(--navy);color:#fff;border-bottom:5px solid var(--saffron);position:sticky;top:0;z-index:20}
+.bar{display:flex;align-items:center;gap:14px;padding:10px 18px;max-width:1080px;margin:0 auto;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer;background:none;border:0;color:#fff;text-align:left;padding:0}
+.brand img,.brand svg{height:46px;width:auto;background:#fff;border-radius:6px;padding:3px}
+.brand b{display:block;font-family:var(--head);font-size:1.05rem;letter-spacing:.2px}
+.brand span{display:block;font-size:.78rem;opacity:.8}
+nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;color:#fff;padding:9px 13px;border-radius:6px;cursor:pointer;font-weight:600}
+nav button:hover{background:rgba(255,255,255,.12)}
+nav button[aria-current="page"]{background:var(--saffron);color:#1a1000}
+
+/* hero */
+.hero{background:linear-gradient(180deg,var(--navy) 0,var(--navy-2) 100%);color:#fff;padding:34px 0 44px}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;align-items:center}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800}
+.hero p{max-width:46ch;opacity:.92;margin:14px 0 22px}
+.btn{display:inline-block;border:0;border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer;background:var(--saffron);color:#1a1000}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);margin-left:8px}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.plain{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.lab{background:#fff;color:var(--ink);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.lab svg{width:100%;height:auto;display:block;background:#F8FAFD;border-radius:8px;cursor:crosshair;touch-action:manipulation}
+.lab .row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-size:.92rem;color:var(--muted);flex-wrap:wrap}
+.lab .row button{background:none;border:1.5px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--navy);font-weight:600}
+.lab strong{color:var(--navy)}
+
+/* sections */
+main{min-height:60vh}
+.view{display:none;padding:34px 0 60px}
+.view.on{display:block}
+.view>.wrap>h2{font-size:clamp(1.6rem,3.5vw,2.2rem);color:var(--navy)}
+.lead{color:var(--muted);max-width:62ch;margin:8px 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.card h3{font-size:1.15rem;color:var(--navy);margin-bottom:6px}
+.card p{margin:6px 0;color:var(--ink)}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--saffron-soft);color:#8a4300;margin-right:6px}
+.tag.lvl{background:#E4ECFA;color:var(--navy)}
+.small{font-size:.9rem;color:var(--muted)}
+
+/* roadmap */
+.road{display:grid;gap:14px}
+.mod{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;background:#fff;border:1px solid var(--line);border-left:6px solid var(--navy);border-radius:10px;padding:16px 18px}
+.mod.done{border-left-color:var(--ok);background:#F3FBF7}
+.mod .wk{font-family:var(--head);font-weight:800;font-size:1.05rem;color:var(--saffron);min-width:56px}
+.mod h3{font-size:1.1rem;color:var(--navy)}
+.mod ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:.95rem}
+.mod label{display:flex;gap:6px;align-items:center;font-weight:600;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.mod input{width:18px;height:18px;accent-color:var(--ok)}
+.prog{height:10px;background:#DDE3F0;border-radius:99px;overflow:hidden;margin:6px 0 22px;max-width:420px}
+.prog i{display:block;height:100%;background:var(--saffron);width:0;transition:width .3s}
+
+/* filters */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 15px;cursor:pointer;font-weight:600;color:var(--navy)}
+.chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+details{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details ol{padding-left:20px;margin:8px 0 0}
+details li{margin:3px 0}
+
+/* quiz */
+.qbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;max-width:720px}
+.qtop{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;margin-bottom:8px}
+.qbox h3{font-size:1.25rem;margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;margin:8px 0;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--navy)}
+.opt.right{border-color:var(--ok);background:#EAF7F0}
+.opt.wrong{border-color:var(--bad);background:#FCEEEC}
+.why{margin:12px 0;padding:10px 12px;border-radius:8px;background:#EEF3FC;font-size:.95rem}
+.score{font-family:var(--head);font-size:3rem;font-weight:800;color:var(--navy)}
+
+/* forms */
+form{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;max-width:560px}
+.f{margin-bottom:14px}
+.f label{display:block;font-weight:700;margin-bottom:4px;font-size:.95rem}
+.f input:not([type=checkbox]),.f select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+.f input:focus,.f select:focus{border-color:var(--navy)}
+.f .err{color:var(--bad);font-size:.85rem;min-height:1.1em;margin-top:3px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;color:var(--muted)}
+.check input{margin-top:4px;width:18px;height:18px;accent-color:var(--navy)}
+.note{border-radius:8px;padding:10px 14px;margin:14px 0;font-weight:600}
+.note.ok{background:#EAF7F0;color:#125c3b}
+.note.info{background:#EEF3FC;color:var(--navy)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:.92rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{background:#E9EEF8;color:var(--navy)}
+.tscroll{overflow-x:auto;margin:10px 0 24px}
+
+/* footer */
+footer{background:var(--navy);color:#dbe4f5;border-top:5px solid var(--saffron);padding:26px 0;font-size:.95rem}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer b{color:#fff}
+footer button{background:none;border:0;color:#9fb1d4;cursor:pointer;text-decoration:underline}
+
+@media(max-width:820px){
+  .hero .wrap{grid-template-columns:1fr}
+  .mod{grid-template-columns:1fr}
+  nav{margin-left:0;width:100%}
+  nav button{flex:1;padding:9px 6px;font-size:.92rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* lessons */
+.acts{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:150px}
+.acts .btn{padding:9px 14px;text-align:center}
+.lesson{max-width:780px}
+.lsec{margin-top:34px}
+.lsec h3{font-size:1.4rem;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:3px solid var(--saffron-soft)}
+.lsec p{margin:0 0 14px;max-width:70ch}
+.lsec ul{padding-left:20px}
+.lsec li{margin:4px 0}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:#E9EEF8;color:var(--navy);padding:1px 6px;border-radius:4px}
+pre{background:#0E1B36;color:#E8EEFB;border-radius:10px;padding:16px;overflow-x:auto;font-size:.88rem;line-height:1.55;margin:0}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.fig{margin:18px 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+.fig svg{width:100%;height:auto;display:block}
+.fig figcaption{font-size:.9rem;color:var(--muted);margin-top:8px;text-align:center}
+.dg text{font-family:var(--body)}
+.callout{background:#EEF3FC;border-left:6px solid var(--navy);border-radius:8px;padding:14px 18px;margin:18px 0}
+.callout ul{margin:6px 0 0;padding-left:20px}
+.callout.ok{background:#EAF7F0;border-left-color:var(--ok)}
+.callout.bad{background:#FCEEEC;border-left-color:var(--bad)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.toc button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 13px;cursor:pointer;font-size:.9rem;color:var(--navy);font-weight:600}
+.toc button:hover{border-color:var(--navy)}
+.defs{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;margin:0}
+.defs dt,.defs dd{margin:0;padding:10px 14px;border-bottom:1px solid var(--line)}
+.defs dt{font-weight:700;color:var(--navy);background:#F1F4FA}
+.pager{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:26px}
+@media(max-width:560px){.defs{grid-template-columns:1fr}.defs dt{border-bottom:0;padding-bottom:2px}.acts{min-width:0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="bar">
+    <button class="brand" onclick="go('learn')" aria-label="DRIEMS Polytechnic AI and ML hub home">
+      <span id="logoSlot"></span>
+      <span><b>DRIEMS Polytechnic (Autonomous)</b><span>AI &amp; ML Learning Hub</span></span>
+    </button>
+    <nav aria-label="Main">
+      <button data-v="learn" onclick="go('learn')">Learn</button>
+      <button data-v="projects" onclick="go('projects')">Projects</button>
+      <button data-v="quiz" onclick="go('quiz')">Quizzes</button>
+      <button data-v="signup" id="navSign" onclick="go('signup')">Sign up</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- LEARN -->
+<section class="view on" id="v-learn">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Add points. Watch a model learn.</h1>
+        <p>Machine learning starts with a simple idea: find the pattern in data. Learn it step by step, build a project from your own branch, and test yourself with quizzes.</p>
+        <button class="btn" onclick="go('signup')">Create free account</button>
+        <button class="btn ghost" onclick="document.getElementById('roadmap').scrollIntoView()">See the roadmap</button>
+      </div>
+      <div class="lab">
+        <svg id="lab" viewBox="0 0 400 260" role="img" aria-label="Interactive scatter plot. Tap to add points and the best-fit line updates."></svg>
+        <div class="row">
+          <span id="labInfo">Tap the plot to add a point</span>
+          <button onclick="labReset()">Reset points</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="roadmap" style="padding-top:34px">
+    <h2>Your 6-module roadmap</h2>
+    <p class="lead">Made for diploma students. No prior AI knowledge needed. Open a lesson to read the theory, key definitions, diagrams and a worked code example, then take the quiz.</p>
+    <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+    <div class="small" id="progText" style="margin:-16px 0 18px"></div>
+    <div class="road" id="road"></div>
+  </div>
+</section>
+
+<!-- LESSON -->
+<section class="view" id="v-lesson">
+  <div class="wrap lesson" id="lessonArea"></div>
+</section>
+
+<!-- PROJECTS -->
+<section class="view" id="v-projects">
+  <div class="wrap">
+    <h2>Projects for every branch</h2>
+    <p class="lead">Pick your branch, choose a level, and build. Each project lists a dataset idea, tools and the steps to follow.</p>
+    <div class="chips" id="chips" role="group" aria-label="Filter by branch"></div>
+    <div class="grid" id="projGrid"></div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="view" id="v-quiz">
+  <div class="wrap">
+    <h2>Quizzes</h2>
+    <p class="lead">Every module has its own 20-question quiz, plus a general quiz and one for each branch. You see the answer and a short reason after every question.</p>
+    <div id="quizArea"></div>
+  </div>
+</section>
+
+<!-- SIGNUP -->
+<section class="view" id="v-signup">
+  <div class="wrap">
+    <h2 id="signTitle">Create your account</h2>
+    <p class="lead" id="signLead">Sign up with your email to save quiz scores and track your progress.</p>
+    <div id="signArea"></div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="view" id="v-admin">
+  <div class="wrap">
+    <h2>IIC Cell admin</h2>
+    <p class="lead">View sign-ups and quiz results stored in the database.</p>
+    <div id="adminArea"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b>Developed by IIC Cell, DRIEMS Polytechnic (Autonomous)</b><br>
+      Institution's Innovation Council &middot; Tangi, Cuttack, Odisha 754022
+    </div>
+    <button onclick="go('admin')">Admin</button>
+  </div>
+</footer>
+
+<script>
+/* ============================ CONFIG ============================ */
+const CONFIG = {
+  LOGO_URL: "data:image/png;base64,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",            // e.g. "logo.png" or the full link to the DRIEMS Polytechnic logo
+  DB_ENDPOINT: "https://script.google.com/a/macros/driems.ac.in/s/AKfycbxi2ZnLdZGKgNwylvUZFAZbBvxM6fXWpAEbbAKdnuk40ng8YddJGjZenzHGnes0mQZh5Q/exec",         // Google Apps Script / REST URL that receives {type, record}
+  ADMIN_PASSCODE: "iic-admin"   // change this before publishing
+};
+
+/* ============================ HELPERS ============================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let user = null;
+
+/* ============================ DATABASE ============================ */
+const DB = {
+  mem: {signups: [], results: []},
+  persistent: !!(window.storage),
+  async list(name){
+    if (this.persistent){
+      try { const r = await window.storage.get('iic:' + name, true); return r ? JSON.parse(r.value) : []; }
+      catch(e){ return this.mem[name]; }
+    }
+    return this.mem[name];
+  },
+  async add(name, record){
+    const arr = await this.list(name);
+    arr.push(record);
+    this.mem[name] = arr;
+    if (this.persistent){
+      try { await window.storage.set('iic:' + name, JSON.stringify(arr), true); } catch(e){}
+    }
+    if (CONFIG.DB_ENDPOINT){
+      try {
+        await fetch(CONFIG.DB_ENDPOINT, {method:'POST', mode:'no-cors', body: JSON.stringify({type: name, record})});
+      } catch(e){}
+    }
+  },
+  label(){
+    if (CONFIG.DB_ENDPOINT && this.persistent) return 'Saved to remote database and app storage';
+    if (CONFIG.DB_ENDPOINT) return 'Saved to remote database';
+    if (this.persistent) return 'Saved to app storage';
+    return 'Demo mode: data lasts only until you close this page. Set DB_ENDPOINT to store it permanently.';
+  }
+};
+
+/* ============================ LOGO ============================ */
+(function(){
+  const slot = $('logoSlot');
+  const fallback = '<svg viewBox="0 0 64 64" role="img" aria-label="DRIEMS logo placeholder"><rect width="64" height="64" rx="8" fill="#fff"/><path d="M8 50V14h16c14 0 22 7 22 18s-8 18-22 18z" fill="#0A2A5E"/><path d="M28 50l16-36h8L36 50z" fill="#F58220"/><text x="32" y="60" text-anchor="middle" font-size="8" font-family="Arial" font-weight="700" fill="#0A2A5E">DRIEMS</text></svg>';
+  if (CONFIG.LOGO_URL){
+    const img = new Image();
+    img.alt = 'DRIEMS Polytechnic logo';
+    img.onerror = () => { slot.innerHTML = fallback; };
+    img.src = CONFIG.LOGO_URL;
+    slot.appendChild(img);
+  } else slot.innerHTML = fallback;
+})();
+
+/* ============================ NAVIGATION ============================ */
+function go(v){
+  document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  document.querySelectorAll('nav button').forEach(b => b.removeAttribute('aria-current'));
+  const nb = document.querySelector('nav button[data-v="' + (v === 'lesson' ? 'learn' : v) + '"]');
+  if (nb) nb.setAttribute('aria-current', 'page');
+  if (v === 'signup') renderSignup();
+  if (v === 'quiz') renderQuizMenu();
+  if (v === 'admin') renderAdmin();
+  window.scrollTo({top: 0});
+}
+
+/* ============================ HERO LAB ============================ */
+let pts = [[50,200],[90,178],[130,170],[170,140],[210,130],[250,105],[300,90],[350,60]];
+function labDraw(){
+  const svg = $('lab');
+  let g = '';
+  for (let x = 0; x <= 400; x += 50) g += '<line x1="'+x+'" y1="0" x2="'+x+'" y2="260" stroke="#E3E8F2"/>';
+  for (let y = 0; y <= 260; y += 52) g += '<line x1="0" y1="'+y+'" x2="400" y2="'+y+'" stroke="#E3E8F2"/>';
+  const n = pts.length;
+  let info = 'Tap the plot to add a point';
+  if (n >= 2){
+    const mx = pts.reduce((a,p)=>a+p[0],0)/n, my = pts.reduce((a,p)=>a+p[1],0)/n;
+    let sxx = 0, sxy = 0, syy = 0;
+    pts.forEach(p => { sxx += (p[0]-mx)**2; sxy += (p[0]-mx)*(p[1]-my); syy += (p[1]-my)**2; });
+    if (sxx > 0){
+      const m = sxy/sxx, b = my - m*mx;
+      pts.forEach(p => { const py = m*p[0]+b; g += '<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+p[0]+'" y2="'+py+'" stroke="#F58220" stroke-width="1.5" stroke-dasharray="3 3"/>'; });
+      g += '<line x1="0" y1="'+b+'" x2="400" y2="'+(m*400+b)+'" stroke="#0A2A5E" stroke-width="3" stroke-linecap="round"/>';
+      const r2 = syy > 0 ? (sxy*sxy)/(sxx*syy) : 1;
+      info = n + ' points &middot; fit quality (R&sup2;): <strong>' + r2.toFixed(2) + '</strong>';
+    }
+  }
+  pts.forEach(p => { g += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="#F58220" stroke="#fff" stroke-width="2"/>'; });
+  svg.innerHTML = g;
+  $('labInfo').innerHTML = info;
+}
+$('lab').addEventListener('click', e => {
+  const r = $('lab').getBoundingClientRect();
+  pts.push([(e.clientX - r.left) / r.width * 400, (e.clientY - r.top) / r.height * 260]);
+  labDraw();
+});
+function labReset(){ pts = []; labDraw(); }
+labDraw();
+
+/* ============================ ROADMAP ============================ */
+const MODULES = [
+  {wk:'Wk 1-2', t:'Python for problem solving', l:['Variables, loops, functions','Lists and dictionaries','Reading and writing files']},
+  {wk:'Wk 3-4', t:'Maths you need, in plain terms', l:['Mean, variance, probability','Slope of a line and the idea of a gradient','Vectors and matrices as tables of numbers']},
+  {wk:'Wk 5-6', t:'Data with NumPy and Pandas', l:['Load a CSV and clean missing values','Plot with Matplotlib','Split data into train and test sets']},
+  {wk:'Wk 7-9', t:'Classic machine learning with scikit-learn', l:['Linear regression and decision trees','Classification and k-means clustering','Accuracy, F1, confusion matrix, cross-validation']},
+  {wk:'Wk 10-12', t:'Neural networks and deep learning', l:['Perceptron and activation functions','CNNs for images','Train a small model in Keras or PyTorch']},
+  {wk:'Wk 13-14', t:'Ship it', l:['Make a web demo with Streamlit','TinyML on ESP32 or Arduino','Bias, privacy and responsible AI']}
+];
+let done = new Set();
+function renderRoad(){
+  $('road').innerHTML = MODULES.map((m,i) =>
+    '<div class="mod'+(done.has(i)?' done':'')+'"><div class="wk">'+m.wk+'</div><div><h3>'+esc(m.t)+'</h3><ul>'+m.l.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+    '<div class="acts"><button class="btn navy" data-l="'+i+'">Read lesson</button><button class="btn plain" data-q="'+i+'">Take quiz</button><label><input type="checkbox" data-i="'+i+'" '+(done.has(i)?'checked':'')+'> Mark done</label></div></div>').join('');
+  $('road').querySelectorAll('button[data-l]').forEach(b => b.addEventListener('click', () => openLesson(+b.dataset.l)));
+  $('road').querySelectorAll('button[data-q]').forEach(b => b.addEventListener('click', () => startQuiz(Object.keys(QUIZ)[+b.dataset.q])));
+  $('road').querySelectorAll('input[type=checkbox]').forEach(c => c.addEventListener('change', () => {
+    const i = +c.dataset.i; c.checked ? done.add(i) : done.delete(i);
+    saveProgress(); renderRoad();
+  }));
+  const pct = Math.round(done.size / MODULES.length * 100);
+  $('progBar').style.width = pct + '%';
+  $('progText').textContent = done.size + ' of ' + MODULES.length + ' modules done' + (user ? '' : ' (sign up to keep your progress)');
+}
+async function saveProgress(){
+  if (window.storage){ try { await window.storage.set('iic:progress', JSON.stringify([...done]), false); } catch(e){} }
+}
+async function loadProgress(){
+  if (window.storage){ try { const r = await window.storage.get('iic:progress', false); if (r) done = new Set(JSON.parse(r.value)); } catch(e){} }
+  renderRoad();
+}
+
+/* ============================ LESSONS ============================ */
+const C = {navy:'#0A2A5E', saf:'#F58220', lt:'#E4ECFA', sf:'#FDEBD8', ok:'#1B8A5A', okl:'#EAF7F0', bad:'#C6362B', badl:'#FCEEEC', ink:'#101B33', mut:'#5A6580'};
+const DEFS = '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0A2A5E"/></marker></defs>';
+function T(x, y, t, o){
+  o = o || {};
+  const L = [].concat(t), fs = o.fs || 14, lh = fs * 1.3, y0 = y - (L.length - 1) * lh / 2;
+  return '<text x="'+x+'" y="'+y0+'" text-anchor="'+(o.a || 'middle')+'" dominant-baseline="central" font-size="'+fs+'" font-weight="'+(o.w || 600)+'" fill="'+(o.c || C.ink)+'">'+
+    L.map((l, i) => '<tspan x="'+x+'" dy="'+(i ? lh : 0)+'">'+esc(l)+'</tspan>').join('') + '</text>';
+}
+function B(x, y, w, h, t, o){
+  o = o || {};
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(o.r == null ? 8 : o.r)+'" fill="'+(o.f || C.lt)+'" stroke="'+(o.s || C.navy)+'" stroke-width="'+(o.sw || 2)+'"/>' + (t ? T(x + w/2, y + h/2, t, o) : '');
+}
+function A(x1, y1, x2, y2){ return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+C.navy+'" stroke-width="2" marker-end="url(#ah)"/>'; }
+function SA(x1, y1, x2, y2, d){ const L = Math.hypot(x2-x1, y2-y1), ux = (x2-x1)/L, uy = (y2-y1)/L; return A(x1+ux*d, y1+uy*d, x2-ux*d, y2-uy*d); }
+function SV(w, h, label, inner){ return '<svg class="dg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(label)+'">'+DEFS+inner+'</svg>'; }
+function FIG(svg, cap){ return '<figure class="fig">'+svg+'<figcaption>'+esc(cap)+'</figcaption></figure>'; }
+function row5(labels){
+  let s = '';
+  labels.forEach((l, i) => { s += B(i*100, 20, 80, 60, l, {fs:12}); if (i < labels.length - 1) s += A(i*100+80, 50, (i+1)*100, 50); });
+  return s;
+}
+
+const DG = {
+py_types: () => FIG(SV(480,170,'The four Python collections',
+  B(5,5,230,72,['list   [1, 2, 3]','ordered, can change']) + B(245,5,230,72,['tuple   (1, 2, 3)','ordered, cannot change']) +
+  B(5,90,230,72,['dict   {"a": 1}','key and value pairs'],{f:C.sf,s:C.saf}) + B(245,90,230,72,['set   {1, 2, 3}','unique items only'],{f:C.sf,s:C.saf})),
+  'Figure: the four built-in collections. Ask two questions: does order matter, and must the items change?'),
+py_flow: () => FIG(SV(480,205,'Flowchart of an if-else decision',
+  B(190,5,100,32,'Start',{r:16}) + A(240,37,240,58) +
+  '<polygon points="240,58 350,110 240,162 130,110" fill="'+C.sf+'" stroke="'+C.saf+'" stroke-width="2"/>' + T(240,110,'marks >= 40 ?') +
+  A(130,110,105,110) + T(118,97,'Yes',{fs:12,c:C.ok}) + B(5,85,100,50,'print("Pass")',{f:C.okl,s:C.ok,fs:13}) +
+  A(350,110,375,110) + T(362,97,'No',{fs:12,c:C.bad}) + B(375,85,100,50,'print("Fail")',{f:C.badl,s:C.bad,fs:13}) +
+  T(240,188,'Either way, the program then carries on with the next line',{fs:12,c:C.mut,w:400})),
+  'Figure: an if / else decision. The program takes exactly one branch.'),
+py_func: () => FIG(SV(480,130,'A function takes inputs and returns an output',
+  B(10,40,110,50,['Inputs','a = 3, b = 4'],{fs:13}) + A(120,65,158,65) +
+  B(160,15,170,100,['def add(a, b):','    return a + b'],{f:C.sf,s:C.saf,fs:13}) + A(330,65,368,65) + B(370,40,100,50,['Output','7'],{f:C.okl,s:C.ok,fs:13})),
+  'Figure: a function is a named recipe. Inputs go in, one result comes out.'),
+
+mt_bell: () => {
+  const g = x => 170 - 130 * Math.exp(-0.5 * Math.pow((x - 240) / 60, 2));
+  let p = '', s = 'M180 170 ';
+  for (let x = 20; x <= 460; x += 4) p += (x === 20 ? 'M' : 'L') + x + ' ' + g(x).toFixed(1) + ' ';
+  for (let x = 180; x <= 300; x += 4) s += 'L' + x + ' ' + g(x).toFixed(1) + ' ';
+  s += 'L300 170 Z';
+  return FIG(SV(480,215,'Bell curve with the mean and one standard deviation each side',
+    '<path d="'+s+'" fill="'+C.sf+'"/><path d="'+p+'" fill="none" stroke="'+C.navy+'" stroke-width="3"/>' +
+    '<line x1="20" y1="170" x2="460" y2="170" stroke="'+C.mut+'"/>' +
+    '<line x1="240" y1="40" x2="240" y2="170" stroke="'+C.saf+'" stroke-width="2" stroke-dasharray="5 4"/>' +
+    '<rect x="196" y="112" width="88" height="34" rx="6" fill="'+C.sf+'"/>' + T(240,129,['about 68%','of values'],{fs:13}) +
+    T(240,188,'mean',{fs:13}) + T(180,188,'-1 std',{fs:12,c:C.mut,w:400}) + T(300,188,'+1 std',{fs:12,c:C.mut,w:400}) +
+    T(240,18,'Normal distribution',{fs:13,c:C.mut})),
+    'Figure: in a normal distribution most values sit close to the mean. About 68% fall within one standard deviation.');
+},
+mt_grad: () => {
+  const f = x => 175 - 0.0038 * Math.pow(x - 240, 2);
+  let p = '';
+  for (let x = 40; x <= 440; x += 4) p += (x === 40 ? 'M' : 'L') + x + ' ' + f(x).toFixed(1) + ' ';
+  const xs = [60, 120, 175, 210, 230];
+  let s = '';
+  xs.forEach((x, i) => {
+    if (i < xs.length - 1) s += SA(x, f(x), xs[i+1], f(xs[i+1]), 9);
+    s += '<circle cx="'+x+'" cy="'+f(x).toFixed(1)+'" r="6" fill="'+C.saf+'" stroke="#fff" stroke-width="2"/>';
+  });
+  return FIG(SV(480,225,'Gradient descent walking down a loss curve',
+    '<path d="'+p+'" fill="none" stroke="'+C.navy+'" stroke-width="3"/><line x1="30" y1="190" x2="450" y2="190" stroke="'+C.mut+'"/>' + s +
+    T(80,40,'start',{fs:13,a:'start'}) + T(240,208,'lowest loss',{fs:13}) + T(30,12,'loss',{a:'start',fs:12,c:C.mut,w:400}) + T(450,208,'weight',{a:'end',fs:12,c:C.mut,w:400})),
+    'Figure: gradient descent. Each step moves downhill. Steps get smaller as the slope flattens near the minimum.');
+},
+mt_matrix: () => {
+  const hd = ['area (sq ft)','rooms','age (yrs)'], rows = [[850,2,10],[1200,3,5],[600,1,20],[1500,4,2]];
+  let s = T(245,14,'features (columns)',{fs:13,c:C.saf});
+  hd.forEach((h, j) => { s += B(110 + j*100, 28, 100, 32, h, {r:0,sw:1,fs:12,f:C.lt}); });
+  rows.forEach((r, i) => {
+    s += T(100, 76 + i*32, 'house ' + (i+1), {a:'end',fs:12,c:C.mut,w:400});
+    r.forEach((v, j) => { s += B(110 + j*100, 60 + i*32, 100, 32, String(v), {r:0,sw:1,fs:13,f:'#fff'}); });
+  });
+  s += T(240,205,'Each row is one sample. Each column is one feature.',{fs:13});
+  return FIG(SV(480,222,'A small matrix of house data',s), 'Figure: a dataset is a matrix. Rows are samples, columns are features.');
+},
+
+ds_pipe: () => FIG(SV(480,115,'Steps of a data preparation pipeline',
+  row5([['Load','read_csv'],['Explore','describe()'],['Clean','fillna()'],['Encode','one-hot'],['Split','train / test']]) +
+  T(240,102,'Every step is one or two lines of Pandas or scikit-learn code',{fs:12,c:C.mut,w:400})),
+  'Figure: the usual order of work before any model is trained.'),
+ds_frame: () => {
+  const cols = [['index',20,50],['name',70,100],['age',170,70],['branch',240,110],['marks',350,90]];
+  const data = [['0','Asha','17','Civil','78'],['1','Ravi','18','Mech','45'],['2','Meera','17','CSE','91']];
+  let s = '';
+  cols.forEach(c => { s += B(c[1], 40, c[2], 30, c[0], {r:0,sw:1,fs:13,f:C.lt}); });
+  data.forEach((r, i) => r.forEach((v, j) => { s += B(cols[j][1], 70 + i*30, cols[j][2], 30, v, {r:0,sw:1,fs:13,f:j === 0 ? '#F1F4FA' : '#fff'}); }));
+  s += T(395,14,'a column = a feature',{fs:12,c:C.saf}) + A(395,25,395,39) + T(45,14,'row label',{fs:12,c:C.saf}) + A(45,25,45,39);
+  s += T(240,180,'Each row is one student. Each column is one property of the student.',{fs:12,c:C.mut,w:400});
+  return FIG(SV(480,195,'Anatomy of a Pandas DataFrame',s), 'Figure: a DataFrame is a table with labelled rows and columns.');
+},
+ds_split: () => FIG(SV(480,115,'Data split into 80 percent training and 20 percent test',
+  B(40,25,320,46,'Train 80%  (the model learns here)',{r:0,fs:13}) + B(360,25,80,46,'Test 20%',{r:0,f:C.sf,s:C.saf,fs:13}) +
+  T(240,95,'Test data stays hidden until the final check',{fs:12,c:C.mut,w:400})),
+  'Figure: never judge a model on the data it trained on.'),
+
+ml_types: () => FIG(SV(480,215,'Supervised versus unsupervised learning',
+  T(115,12,'Supervised learning',{fs:14}) + B(10,28,210,44,['Inputs + correct answers','(labelled data)'],{fs:13}) + A(115,72,115,92) +
+  B(10,92,210,44,'Learn the mapping',{fs:13}) + A(115,136,115,156) + B(10,156,210,44,['Predict answers','for new inputs'],{f:C.okl,s:C.ok,fs:13}) +
+  T(365,12,'Unsupervised learning',{fs:14}) + B(260,28,210,44,['Inputs only','(no labels)'],{fs:13}) + A(365,72,365,92) +
+  B(260,92,210,44,'Find structure',{fs:13}) + A(365,136,365,156) + B(260,156,210,44,['Groups and patterns','in the data'],{f:C.sf,s:C.saf,fs:13})),
+  'Figure: supervised learning has the right answers to learn from. Unsupervised learning does not.'),
+ml_conf: () => FIG(SV(480,270,'Confusion matrix with precision recall and accuracy formulas',
+  T(215,36,'Predicted YES',{fs:13}) + T(345,36,'Predicted NO',{fs:13}) + T(85,90,'Actual YES',{fs:13}) + T(85,158,'Actual NO',{fs:13}) +
+  B(150,50,130,66,['TP','true positive'],{f:C.okl,s:C.ok,fs:13}) + B(280,50,130,66,['FN','missed case'],{f:C.badl,s:C.bad,fs:13}) +
+  B(150,116,130,66,['FP','false alarm'],{f:C.badl,s:C.bad,fs:13}) + B(280,116,130,66,['TN','true negative'],{f:C.okl,s:C.ok,fs:13}) +
+  T(240,205,'Precision = TP / (TP + FP)',{fs:13}) + T(240,226,'Recall = TP / (TP + FN)',{fs:13}) + T(240,247,'Accuracy = (TP + TN) / all predictions',{fs:13})),
+  'Figure: every classification result falls in one of four cells. The metrics are ratios of these cells.'),
+ml_fit: () => {
+  const pts = [[10,30],[30,58],[50,78],[70,84],[90,74],[110,52],[130,26]];
+  const dots = pts.map(p => '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="'+C.saf+'"/>').join('');
+  const panel = (x, body, t1, t2) => '<g transform="translate('+x+',5)"><rect x="0" y="0" width="145" height="105" fill="#F8FAFD" stroke="'+C.lt+'"/>' + body + dots + '</g>' + T(x+72,128,[t1,t2],{fs:12});
+  return FIG(SV(480,150,'Underfit good fit and overfit curves',
+    panel(5,'<line x1="5" y1="58" x2="140" y2="52" stroke="'+C.navy+'" stroke-width="3"/>','Underfit','too simple') +
+    panel(168,'<path d="M5 22 Q72 138 140 22" fill="none" stroke="'+C.navy+'" stroke-width="3"/>','Good fit','captures the pattern') +
+    panel(331,'<polyline points="5,22 10,30 20,70 30,58 40,88 50,78 60,92 70,84 80,60 90,74 100,40 110,52 120,18 130,26 140,20" fill="none" stroke="'+C.navy+'" stroke-width="2.5"/>','Overfit','memorises the noise')),
+    'Figure: the same data fitted three ways. The goal is the middle one.');
+},
+
+nn_neuron: () => FIG(SV(480,175,'A single artificial neuron',
+  ['x1','x2','x3'].map((l, i) => { const y = 35 + i*52; return '<circle cx="35" cy="'+y+'" r="16" fill="'+C.lt+'" stroke="'+C.navy+'" stroke-width="2"/>' + T(35,y,l,{fs:12}) + SA(51,y,198,87,0) + T(112,y+(87-y)*0.45-9,'w'+(i+1),{fs:12,c:C.saf}); }).join('') +
+  '<circle cx="230" cy="87" r="32" fill="'+C.sf+'" stroke="'+C.saf+'" stroke-width="2"/>' + T(230,87,['Sum','+ bias'],{fs:12}) + A(262,87,298,87) +
+  B(300,62,64,50,['f(z)','activation'],{fs:12}) + A(364,87,404,87) + B(406,67,64,40,'output y',{f:C.okl,s:C.ok,fs:12})),
+  'Figure: a neuron multiplies each input by a weight, adds them up with a bias, then applies an activation function.'),
+nn_net: () => {
+  const layers = [3,4,4,2], xs = [60,180,300,420], names = ['Input','Hidden 1','Hidden 2','Output'];
+  const ys = n => Array.from({length:n}, (_, i) => 100 + (i - (n-1)/2) * 45);
+  let lines = '', nodes = '';
+  for (let l = 0; l < 3; l++) ys(layers[l]).forEach(y1 => ys(layers[l+1]).forEach(y2 => { lines += '<line x1="'+xs[l]+'" y1="'+y1+'" x2="'+xs[l+1]+'" y2="'+y2+'" stroke="#B8C4DE" stroke-width="1"/>'; }));
+  layers.forEach((n, l) => ys(n).forEach(y => { nodes += '<circle cx="'+xs[l]+'" cy="'+y+'" r="14" fill="'+(l === 3 ? C.saf : l === 0 ? C.lt : '#fff')+'" stroke="'+C.navy+'" stroke-width="2"/>'; }));
+  const lab = names.map((nm, i) => T(xs[i],200,nm,{fs:13})).join('');
+  return FIG(SV(480,222,'A small neural network with two hidden layers', lines + nodes + lab), 'Figure: layers of neurons. Every neuron connects to every neuron in the next layer. Data flows left to right.');
+},
+nn_act: () => {
+  let sg = '';
+  for (let x = 260; x <= 460; x += 4){ const z = (x - 360) / 40; sg += (x === 260 ? 'M' : 'L') + x + ' ' + (130 - 100 / (1 + Math.exp(-z))).toFixed(1) + ' '; }
+  return FIG(SV(480,175,'ReLU and sigmoid activation functions',
+    '<line x1="20" y1="130" x2="220" y2="130" stroke="'+C.mut+'"/><line x1="120" y1="20" x2="120" y2="135" stroke="'+C.mut+'"/>' +
+    '<polyline points="20,130 120,130 210,40" fill="none" stroke="'+C.navy+'" stroke-width="3"/>' + T(120,155,'ReLU: max(0, x)',{fs:13}) +
+    '<line x1="260" y1="130" x2="460" y2="130" stroke="'+C.mut+'"/><line x1="360" y1="20" x2="360" y2="135" stroke="'+C.mut+'"/>' +
+    '<path d="'+sg+'" fill="none" stroke="'+C.saf+'" stroke-width="3"/>' + T(360,155,'Sigmoid: output from 0 to 1',{fs:13}) +
+    T(372,30,'1',{fs:11,c:C.mut,w:400,a:'start'})),
+    'Figure: ReLU passes positive values and blocks negatives. Sigmoid squashes any number into the range 0 to 1.');
+},
+nn_cnn: () => FIG(SV(480,135,'Stages of a convolutional neural network',
+  row5([['Image'],['Conv','+ ReLU'],['Pooling'],['Dense','layers'],['Softmax']]) +
+  T(40,100,'pixels',{fs:12,c:C.mut,w:400}) + T(140,100,'finds edges',{fs:12,c:C.mut,w:400}) + T(240,100,'shrinks',{fs:12,c:C.mut,w:400}) + T(340,100,'combines',{fs:12,c:C.mut,w:400}) + T(440,100,'probabilities',{fs:12,c:C.mut,w:400}) +
+  T(240,122,'Convolution and pooling are usually repeated several times',{fs:12,w:400})),
+  'Figure: a CNN turns pixels into features, then features into a class probability.'),
+
+dp_pipe: () => FIG(SV(480,140,'The deployment loop',
+  row5([['Train','model'],['Save','joblib'],['Serve','app or API'],['Users','use it'],['Monitor','accuracy']]) +
+  '<polyline points="440,82 440,106 40,106 40,84" fill="none" stroke="'+C.navy+'" stroke-width="2" marker-end="url(#ah)"/>' +
+  T(240,124,'retrain when accuracy drops',{fs:12,c:C.saf})),
+  'Figure: shipping is a loop, not a finish line.'),
+dp_edge: () => FIG(SV(480,210,'Cloud AI compared with edge AI',
+  T(5,12,'Cloud AI',{a:'start',fs:13}) + B(5,26,100,46,'Sensor',{fs:13}) + A(105,49,165,49) + T(135,38,'internet',{fs:11,c:C.mut,w:400}) +
+  B(165,26,120,46,['Cloud server','big model'],{fs:12}) + A(285,49,345,49) + B(345,26,130,46,'Result',{fs:13,f:C.okl,s:C.ok}) +
+  T(240,88,'Powerful, but needs internet and adds delay',{fs:12,c:C.mut,w:400}) +
+  T(5,118,'Edge AI / TinyML',{a:'start',fs:13}) + B(5,132,210,46,['Sensor + microcontroller','runs a small model'],{f:C.sf,s:C.saf,fs:12}) + A(215,155,345,155) + B(345,132,130,46,'Result',{fs:13,f:C.okl,s:C.ok}) +
+  T(240,196,'Fast, private and low power, but the model must be small',{fs:12,c:C.mut,w:400})),
+  'Figure: cloud AI sends data away to be processed. Edge AI keeps the model on the device.')
+};
+
+const LESSONS = [
+/* ---------------- MODULE 1 ---------------- */
+{
+ time: 'Weeks 1 to 2  |  about 8 hours',
+ intro: `Python is the main language of AI and machine learning. Almost every library you will use later, such as NumPy, Pandas, scikit-learn, Keras and PyTorch, is written for Python. It reads almost like English, so you can spend your time on ideas instead of syntax. This module gives you the small set of Python skills that everything else builds on.`,
+ goals: ['Store and organise data using variables, lists and dictionaries','Make decisions and repeat work with if statements and loops','Write and reuse functions','Read files and handle errors safely','Install and import libraries'],
+ sections: [
+  {h:'1. Variables and data types', p:[
+   `A **variable** is a name that points to a value stored in memory. You create one by assigning with a single equals sign, for example [[age = 17]]. The value can change later, which is why it is called a variable.`,
+   `Every value has a **data type**. The four basic types are **int** (whole numbers like 7), **float** (decimals like 3.14), **str** (text like "AI") and **bool** (True or False). Python works out the type for you, and you can check it with [[type(x)]].`,
+   `Types matter because they decide what you can do. You can add two numbers, and you can join two strings with +, but adding a number to a string gives an error. Convert between types with [[int()]], [[float()]] and [[str()]].`]},
+  {h:'2. Collections: lists, tuples, dictionaries and sets', p:[
+   `A single variable holds one value. Real data comes in groups, so Python gives you four built-in collections.`,
+   `A **list** keeps items in order and lets you change them: [[marks = [78, 45, 91]]]. You reach an item by its **index**, and counting starts at 0, so [[marks[0]]] is 78. Use [[append]] to add an item and [[len()]] to count them.`,
+   `A **dictionary** stores pairs of key and value, like a phone book: [[student = {"name": "Asha", "age": 17}]]. You look up a value by its key with [[student["name"]]]. Dictionaries are how you will meet JSON data from web services later.`,
+   `A **tuple** is like a list that cannot be changed after creation, and a **set** keeps only unique items. Use a tuple for fixed groups such as (x, y) coordinates and a set to remove duplicates.`], d:['py_types']},
+  {h:'3. Making decisions and repeating work', p:[
+   `Programs need to choose between actions. An **if / elif / else** block runs only the branch whose condition is true. Conditions use comparison operators such as [[==]], [[!=]], [[>]] and [[>=]], and you can combine them with [[and]], [[or]] and [[not]].`,
+   `A **for loop** repeats work for every item in a collection, for example [[for m in marks:]]. A **while loop** repeats as long as a condition stays true. Use for when you know what you are looping over, and while when you are waiting for something to happen.`,
+   `Python uses **indentation** (four spaces) to show which lines belong inside a block. This is not decoration: wrong indentation changes what your program does.`], d:['py_flow']},
+  {h:'4. Functions', p:[
+   `A **function** is a named block of code that you can run again and again. You define it with [[def]], list its **parameters** in brackets, and send a result back with [[return]]. When you call the function you give it **arguments**, which fill the parameters.`,
+   `Functions stop you repeating yourself. If you write the same five lines twice, turn them into a function. In machine learning you will write functions such as [[clean_data()]] and [[evaluate_model()]] all the time.`], d:['py_func']},
+  {h:'5. Files and errors', p:[
+   `Data usually lives in files. The safe way to read one is [[with open("data.txt") as f:]], because Python closes the file for you automatically, even if something goes wrong.`,
+   `Errors will happen: a file is missing, a value is not a number. A **syntax error** means Python cannot understand your code and it will not run. An **exception** happens while the program is running. Wrap risky code in [[try:]] and catch the problem in [[except:]] so your program can respond instead of crashing.`]},
+  {h:'6. Libraries and pip', p:[
+   `A **library** (or module) is code written by other people that you can reuse. Install one with [[pip install pandas]] in the terminal, then use it in your program with [[import pandas as pd]]. The short name after [[as]] saves typing.`,
+   `Keep each project in its own **virtual environment** so that library versions from one project do not clash with another. Python ships with a tool for this: [[python -m venv env]].`]}
+ ],
+ defs: [['Variable','A name that refers to a value stored in memory.'],['Data type','The kind of value, such as int, float, str or bool.'],['List','An ordered collection of items that can be changed.'],['Dictionary','A collection of key and value pairs, looked up by key.'],['Function','A named, reusable block of code that can take inputs and return a result.'],['Argument','The actual value you pass into a function when you call it.'],['Loop','A structure that repeats a block of code.'],['Indentation','The spaces at the start of a line that show which block it belongs to.'],['Exception','An error that occurs while the program is running.'],['Library','A collection of ready-made code you can import and reuse.']],
+ code: {t:'Worked example: grade calculator', c:`marks = {"Asha": 78, "Ravi": 45, "Meera": 91}
+
+def grade(score):
+    if score >= 75:
+        return "A"
+    elif score >= 40:
+        return "Pass"
+    return "Fail"
+
+total = 0
+for name, score in marks.items():
+    print(name, score, grade(score))
+    total += score
+
+print("Average:", total / len(marks))`},
+ mistakes: ['Using = (assign) when you meant == (compare).','Wrong indentation, which causes errors or silently changes the logic.','Forgetting return, so the function gives back None.','Counting from 1 instead of 0 when using list indexes.','Changing a list while looping over it.'],
+ take: ['Variables store values, and every value has a type.','Lists, dictionaries, tuples and sets organise groups of data.','if and loops control the flow of a program.','Functions make code reusable and easy to test.','Libraries and pip give you thousands of tools for free.'],
+ practice: ['Write a function that takes a list of marks and returns the highest, lowest and average.','Store five students in a dictionary and print only those who scored above 60.','Read a text file and count how many lines it has, with error handling for a missing file.']
+},
+
+/* ---------------- MODULE 2 ---------------- */
+{
+ time: 'Weeks 3 to 4  |  about 8 hours',
+ intro: `Machine learning looks like magic until you see the maths underneath, and the maths is friendlier than most people expect. You do not need advanced calculus. You need four ideas: summarising data with statistics, measuring uncertainty with probability, storing data as vectors and matrices, and using slopes to improve a model step by step.`,
+ goals: ['Describe a dataset with mean, median, variance and standard deviation','Explain probability and conditional probability with examples','Read a dataset as a matrix and compute a dot product','Understand slope, derivative and gradient descent in plain terms','Measure distance between two data points'],
+ sections: [
+  {h:'1. Describing data with statistics', p:[
+   `The **mean** is the average: add all values and divide by how many there are. The **median** is the middle value when the data is sorted. The **mode** is the most frequent value. If one student scores 5 and the rest score around 80, the mean is dragged down but the median barely moves, so the median is more robust to unusual values.`,
+   `The **variance** measures how far values are spread around the mean. Square each difference from the mean, then average the results. The **standard deviation** is the square root of the variance, which puts the spread back into the original unit, such as marks or kilograms.`,
+   `Many natural measurements follow a **normal distribution**, a symmetric bell shape. Around 68% of values lie within one standard deviation of the mean and around 95% within two. A value far outside this range is an **outlier**.`], d:['mt_bell']},
+  {h:'2. Probability', p:[
+   `**Probability** measures how likely an event is, on a scale from 0 (impossible) to 1 (certain). For equally likely outcomes it equals the number of favourable outcomes divided by the total number of outcomes. A fair die shows a 4 with probability 1/6.`,
+   `Two events are **independent** if one does not affect the other. For independent events, P(A and B) = P(A) x P(B). Two coin tosses both landing heads has probability 0.5 x 0.5 = 0.25.`,
+   `**Conditional probability**, written P(A | B), is the chance of A given that B has already happened. A spam filter asks exactly this: what is the probability that a message is spam, given that it contains the word "winner"? Bayes' theorem lets you compute this by combining how common spam is with how often spam contains that word. It is the idea behind Naive Bayes classifiers.`]},
+  {h:'3. Data as vectors and matrices', p:[
+   `A **vector** is a list of numbers, such as the features of one house: [850, 2, 10]. A **matrix** is a table of numbers, and a whole dataset is a matrix where each row is a sample and each column is a feature. Machine learning libraries are fast because they do maths on whole matrices at once.`,
+   `The **dot product** of two vectors multiplies matching entries and adds them up. For [1, 2] and [3, 4] it is 1x3 + 2x4 = 11. A neuron in a neural network is essentially a dot product of inputs and weights.`,
+   `The **transpose** of a matrix swaps its rows and columns. A matrix with 4 rows and 3 columns becomes 3 rows and 4 columns.`], d:['mt_matrix']},
+  {h:'4. Slope, derivative and gradient', p:[
+   `The **slope** of a straight line tells you how much y changes when x increases by 1. In y = 3x + 2 the slope is 3. For a curve, the slope changes from point to point. The **derivative** gives the slope at a single point. For example, the derivative of x squared is 2x.`,
+   `When a function has many inputs, the collection of slopes is called the **gradient**. It points in the direction where the function increases fastest.`,
+   `Training a model means finding weights that make the **loss** (the error) as small as possible. **Gradient descent** does this by repeatedly stepping in the opposite direction to the gradient: new weight = old weight - learning rate x gradient. The **learning rate** controls the step size. Too small and training is slow. Too large and you overshoot the minimum.`], d:['mt_grad']},
+  {h:'5. Distance and scaling', p:[
+   `Many algorithms ask how similar two samples are. The **Euclidean distance** between two points is the straight-line distance: for (0, 0) and (3, 4) it is the square root of 3 squared plus 4 squared, which equals 5. K-nearest neighbours and k-means both rely on it.`,
+   `Distance is misleading when features have different ranges. If one feature is salary in rupees and another is age in years, salary will dominate. **Normalisation** rescales values, for example to the range 0 to 1 using (x - min) / (max - min), so every feature has a fair say.`]}
+ ],
+ defs: [['Mean','The sum of values divided by their count.'],['Median','The middle value of sorted data.'],['Variance','The average squared distance from the mean.'],['Standard deviation','The square root of the variance, in the same unit as the data.'],['Probability','A number from 0 to 1 that says how likely an event is.'],['Conditional probability','The probability of an event given that another event has happened.'],['Vector','An ordered list of numbers.'],['Matrix','A table of numbers arranged in rows and columns.'],['Dot product','Multiply matching entries of two vectors and add the results.'],['Derivative','The slope of a function at one point.'],['Gradient','The vector of slopes that points towards the fastest increase.'],['Learning rate','The size of each step taken during gradient descent.'],['Euclidean distance','The straight-line distance between two points.'],['Normalisation','Rescaling values to a common range.']],
+ code: {t:'Worked example: statistics, vectors and gradient descent in NumPy', c:`import numpy as np
+
+x = np.array([2, 4, 6, 8])
+print(x.mean(), np.median(x), x.std())
+
+a = np.array([1, 2]); b = np.array([3, 4])
+print(np.dot(a, b))              # 11
+print(np.linalg.norm(a - b))     # distance between the two points
+
+# Learn w in y = w * x using gradient descent
+X = np.array([1, 2, 3]); y = np.array([2, 4, 6])
+w, lr = 0.0, 0.1
+for step in range(50):
+    grad = np.mean(2 * (w * X - y) * X)   # slope of the mean squared error
+    w -= lr * grad
+print(w)   # very close to 2`},
+ mistakes: ['Using the mean when the data has extreme outliers. Check the median too.','Confusing independent events with mutually exclusive events.','Forgetting to scale features before distance-based methods.','Setting the learning rate too high and watching the loss explode.'],
+ take: ['Mean, median and standard deviation summarise a dataset.','Probability runs from 0 to 1, and conditional probability drives spam filters.','A dataset is a matrix: rows are samples, columns are features.','Gradient descent walks downhill on the loss curve.','Scale features so distances are fair.'],
+ practice: ['Compute the mean, median and standard deviation of your class marks by hand, then check with NumPy.','Change the learning rate in the gradient descent example to 0.01 and 0.5. What happens?','Find the distance between two students described by (age, marks) with and without scaling.']
+},
+
+/* ---------------- MODULE 3 ---------------- */
+{
+ time: 'Weeks 5 to 6  |  about 8 hours',
+ intro: `A model is only as good as its data. Professionals spend most of their time collecting, cleaning and understanding data, and only a small part training models. In this module you will use NumPy for fast number crunching, Pandas for tables, and Matplotlib for charts, then prepare data so that a model can learn from it.`,
+ goals: ['Recognise different kinds of data','Create and manipulate NumPy arrays','Load, select, filter and group data with Pandas','Clean missing values, duplicates and outliers','Encode categories, scale numbers and split data safely','Choose the right chart for a question'],
+ sections: [
+  {h:'1. Kinds of data', p:[
+   `**Numerical** data is measured in numbers, such as temperature or marks. **Categorical** data has labels, such as branch or fault type. **Text**, **images**, **audio** and **time series** (values recorded over time, like sensor readings) need their own preparation methods, but all of them end up as numbers before a model sees them.`,
+   `In a supervised problem, the columns you use as inputs are the **features** and the column you want to predict is the **target** or **label**. Getting this split clear is the first step of every project.`]},
+  {h:'2. NumPy: fast arrays', p:[
+   `A NumPy **array** is a grid of numbers of one type. It is far faster than a Python list because operations are applied to the whole array at once, which is called **vectorisation**. Adding 10 to every element is just [[a + 10]], with no loop needed.`,
+   `Every array has a **shape**. An array with 3 rows and 4 columns has shape (3, 4). Useful tools include [[np.mean]], [[np.sum]], [[np.reshape]] and slicing such as [[a[:, 0]]] which selects the first column.`]},
+  {h:'3. Pandas: working with tables', p:[
+   `A Pandas **DataFrame** is a table with named columns. Load one from a file with [[pd.read_csv("file.csv")]]. Start every project with [[df.head()]] to see the first rows, [[df.info()]] for column types and [[df.describe()]] for summary statistics.`,
+   `Select a column with [[df["marks"]]]. Filter rows with a condition, for example [[df[df["marks"] > 60]]]. Use [[groupby]] to compute a summary for each group, such as [[df.groupby("branch")["marks"].mean()]] for the average marks of each branch.`], d:['ds_frame']},
+  {h:'4. Cleaning data', p:[
+   `Real data is messy. Check for **missing values** with [[df.isna().sum()]]. You can drop rows that contain them, or fill them with the mean, median or a fixed value using [[fillna]]. Never fill blindly: think about why the value is missing.`,
+   `Remove exact **duplicates** with [[drop_duplicates()]]. Look for **outliers** with a box plot or by checking values many standard deviations from the mean. An outlier can be a typing error (a height of 1700 cm) or a genuinely rare event that you want to keep. Also fix wrong **data types**, such as numbers stored as text.`]},
+  {h:'5. Encoding and scaling', p:[
+   `Models need numbers, so categories must be converted. **One-hot encoding** creates one 0 or 1 column per category, so "Civil", "Mech" and "CSE" become three columns. Use [[pd.get_dummies]] in Pandas. Avoid simply numbering categories 1, 2, 3, because that falsely suggests Mech is bigger than Civil.`,
+   `**Scaling** puts features on similar ranges. **Min-max scaling** squeezes values into 0 to 1. **Standardisation** subtracts the mean and divides by the standard deviation, giving mean 0 and standard deviation 1. Fit the scaler on the training data only and then apply it to the test data.`]},
+  {h:'6. Looking at the data: visualisation', p:[
+   `Exploring data with charts is called **exploratory data analysis (EDA)**. Use a **histogram** to see how one variable is distributed, a **scatter plot** to see the relationship between two variables, a **bar chart** to compare categories and a **box plot** to spot outliers.`,
+   `In Matplotlib, [[plt.hist(df["marks"])]] draws a histogram and [[plt.scatter(df["hours"], df["marks"])]] draws a scatter plot. Always label axes and add a title so the chart makes sense to someone else.`]},
+  {h:'7. The pipeline and the train/test split', p:[
+   `Data preparation follows a repeatable order. Load, explore, clean, encode and scale, then split.`,
+   `Before training, divide the data into a **training set** (the model learns from it) and a **test set** (used once at the end to measure real performance). A common split is 80% and 20%. Sometimes a third **validation set** is kept for tuning settings.`,
+   `**Data leakage** happens when information from the test set sneaks into training, for example scaling using the mean of all the data or having photos of the same object in both sets. It makes results look better than they really are, so guard against it carefully.`], d:['ds_pipe','ds_split']}
+ ],
+ defs: [['Feature','An input variable the model uses to make a prediction.'],['Target (label)','The value the model is trying to predict.'],['Array','A fixed-type grid of numbers in NumPy.'],['Vectorisation','Applying an operation to a whole array at once instead of looping.'],['DataFrame','A Pandas table with labelled rows and columns.'],['Missing value','A cell with no recorded data, shown as NaN.'],['Outlier','A value far away from the rest of the data.'],['One-hot encoding','Turning a category into separate 0/1 columns.'],['Standardisation','Rescaling to mean 0 and standard deviation 1.'],['Training set','Data used to fit the model.'],['Test set','Unseen data used to measure final performance.'],['Data leakage','When test information influences training, giving unrealistically good results.'],['EDA','Exploratory data analysis: studying data with statistics and charts before modelling.']],
+ code: {t:'Worked example: from CSV to train/test split', c:`import pandas as pd
+from sklearn.model_selection import train_test_split
+
+df = pd.read_csv("students.csv")
+print(df.head())
+print(df.isna().sum())                       # missing values per column
+
+df["marks"] = df["marks"].fillna(df["marks"].mean())
+df = df.drop_duplicates()
+df = pd.get_dummies(df, columns=["branch"])  # one-hot encoding
+
+X = df.drop(columns=["passed"])              # features
+y = df["passed"]                             # target
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+print(X_train.shape, X_test.shape)`},
+ mistakes: ['Scaling or filling missing values using the whole dataset before splitting.','Numbering categories 1, 2, 3 instead of one-hot encoding them.','Deleting outliers without checking whether they are real.','Judging a model on the same data it trained on.','Skipping EDA and finding problems only after training.'],
+ take: ['Features are inputs and the target is what you predict.','NumPy is fast because it works on whole arrays.','Pandas DataFrames load, filter, group and clean tabular data.','Clean first, then encode, scale and split.','Keep the test set untouched until the end.'],
+ practice: ['Download any small CSV and report its shape, missing values and summary statistics.','Plot a histogram and a scatter plot of two columns and describe what you see.','Split the data 80/20 and explain why the test set must not be used while tuning.']
+},
+
+/* ---------------- MODULE 4 ---------------- */
+{
+ time: 'Weeks 7 to 9  |  about 12 hours',
+ intro: `Classic machine learning covers the algorithms that work well on tables of data and run on an ordinary laptop. They are quick to train, easy to explain, and often good enough. With scikit-learn, training a model takes only a few lines, so the real skill is choosing the right approach and measuring results honestly.`,
+ goals: ['Tell supervised, unsupervised and reinforcement learning apart','Explain regression, classification and clustering with examples','Describe how linear regression, decision trees, KNN, random forests, SVM and k-means work','Read a confusion matrix and compute precision, recall and F1','Recognise overfitting and underfitting and know how to fix them','Follow the scikit-learn workflow'],
+ sections: [
+  {h:'1. What is machine learning?', p:[
+   `**Machine learning** is teaching computers to find patterns in data instead of writing every rule by hand. A spam filter is a good example. Nobody writes a rule for every spam email, so we show the model thousands of examples and let it learn what spam looks like.`,
+   `There are three main families. In **supervised learning** the data comes with correct answers (labels) and the model learns to predict them. In **unsupervised learning** there are no labels and the model looks for structure such as groups. In **reinforcement learning** an agent learns by trying actions and receiving rewards or penalties, like a robot learning to walk.`], d:['ml_types']},
+  {h:'2. Regression: predicting numbers', p:[
+   `**Regression** predicts a continuous number such as a house price, tomorrow's electricity demand or the strength of concrete. The simplest model is **linear regression**, which fits a straight line y = m x + b through the data. It finds the m and b that make the total squared error as small as possible, a method called **least squares**.`,
+   `To judge a regression model use **MSE** (mean squared error, the average of squared mistakes), **MAE** (mean absolute error, easier to read because it has the same unit as the target) and **R-squared**, which says how much of the variation in the data the model explains. R-squared close to 1 is good.`]},
+  {h:'3. Classification: predicting categories', p:[
+   `**Classification** predicts a class, such as spam or not spam, or which fault a machine has. The main algorithms are:`,
+   `**Logistic regression** despite its name is a classifier. It outputs the probability of a class using an S-shaped curve.`,
+   `A **decision tree** asks a chain of yes/no questions about the features, like a flowchart, until it reaches a decision. Trees are easy to explain but a deep tree memorises the training data.`,
+   `A **random forest** trains many different trees on random parts of the data and lets them vote. Combining many weak opinions gives a strong and stable answer.`,
+   `**K-nearest neighbours (KNN)** classifies a new sample by looking at the k closest training samples and taking a majority vote. It needs scaled features because it relies on distance.`,
+   `A **support vector machine (SVM)** finds the boundary that separates the classes with the widest possible margin.`]},
+  {h:'4. Clustering: finding groups', p:[
+   `**Clustering** groups similar samples when you have no labels. **K-means** is the classic method. Choose k, the number of groups. Place k random centres. Assign every point to its nearest centre. Move each centre to the average of its points. Repeat the last two steps until nothing changes.`,
+   `Typical uses are customer segmentation, grouping similar machines by behaviour, and compressing colours in an image.`]},
+  {h:'5. Measuring performance honestly', p:[
+   `**Accuracy** is the share of correct predictions, but it can mislead. If only 2% of parts are faulty, a model that always says "not faulty" is 98% accurate and completely useless.`,
+   `The **confusion matrix** shows exactly where the model is right and wrong. **Precision** asks: of the cases the model flagged, how many were real? **Recall** asks: of the real cases, how many did the model find? The **F1 score** combines the two. When missing a real case is costly, such as a crack in a bridge, focus on recall.`,
+   `**Cross-validation** makes the estimate more reliable. The data is split into k parts, the model is trained k times, each time testing on a different part, and the scores are averaged.`], d:['ml_conf']},
+  {h:'6. Overfitting and underfitting', p:[
+   `An **underfit** model is too simple to capture the pattern and does badly on both training and test data. An **overfit** model is so flexible that it memorises noise, giving excellent training results but poor results on new data. This gap between training and test performance is the clearest warning sign.`,
+   `To reduce overfitting, get more data, use a simpler model, limit tree depth, apply **regularisation** (a penalty on complexity), or use cross-validation. To reduce underfitting, use a more powerful model or better features. This balance is known as the **bias-variance trade-off**.`], d:['ml_fit']},
+  {h:'7. The scikit-learn workflow', p:[
+   `Every scikit-learn model works the same way: create the model, call [[fit(X, y)]] to train it, call [[predict(X_new)]] to get answers, then measure with a metric. Because the interface is identical, you can swap a decision tree for a random forest by changing one line and compare the results.`,
+   `Tune **hyperparameters**, the settings you choose before training such as tree depth or k, with tools like [[GridSearchCV]]. Do not confuse them with **parameters**, which the model learns itself, like the slope of a line.`]}
+ ],
+ defs: [['Machine learning','Systems that learn patterns from data instead of following hand-written rules.'],['Supervised learning','Learning from labelled examples.'],['Unsupervised learning','Finding structure in data without labels.'],['Regression','Predicting a continuous number.'],['Classification','Predicting a category.'],['Clustering','Grouping similar samples without labels.'],['Overfitting','Doing well on training data but poorly on new data.'],['Underfitting','Being too simple to capture the pattern.'],['Precision','Of predicted positives, the share that are truly positive.'],['Recall','Of real positives, the share the model found.'],['F1 score','The harmonic mean of precision and recall.'],['Cross-validation','Testing on several different splits and averaging the scores.'],['Hyperparameter','A setting chosen before training, such as tree depth.'],['Regularisation','A penalty that discourages overly complex models.']],
+ code: {t:'Worked example: train and evaluate a decision tree', c:`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report
+
+X, y = load_iris(return_X_y=True)
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = DecisionTreeClassifier(max_depth=3, random_state=42)
+model.fit(X_tr, y_tr)                          # learn from training data
+print(classification_report(y_te, model.predict(X_te)))   # precision, recall, F1`},
+ mistakes: ['Reporting accuracy alone on imbalanced data.','Tuning settings on the test set instead of using validation or cross-validation.','Forgetting to scale features for KNN and SVM.','Using a very deep tree and celebrating a perfect training score.','Not setting random_state, so results change every run.'],
+ take: ['Supervised learning needs labels, unsupervised does not.','Regression predicts numbers and classification predicts categories.','Precision, recall and F1 tell you more than accuracy on imbalanced data.','Overfitting is the gap between training and test performance.','In scikit-learn every model uses fit, predict and a score.'],
+ practice: ['Train a decision tree and a random forest on the same data. Which scores better on the test set?','Change max_depth from 1 to 10 and note when overfitting starts.','Use k-means with k = 2, 3 and 4 on a small dataset and describe the groups.']
+},
+
+/* ---------------- MODULE 5 ---------------- */
+{
+ time: 'Weeks 10 to 12  |  about 12 hours',
+ intro: `Neural networks are the technology behind image recognition, speech assistants, translation and chatbots. They are loosely inspired by the brain but are really just layers of simple maths. Once you understand a single neuron, a full network is the same idea repeated many times.`,
+ goals: ['Explain how a neuron and a layer work','Describe common activation functions','Understand loss, gradient descent, backpropagation, epochs and batches','Explain what convolution and pooling do in a CNN','Know when to use RNNs, LSTMs and transformers','Use dropout, early stopping, augmentation and transfer learning','Build a small network in Keras'],
+ sections: [
+  {h:'1. From a neuron to a network', p:[
+   `An artificial **neuron** takes several inputs, multiplies each by a **weight**, adds them together with a **bias**, and passes the total through an **activation function**. In symbols, output = f(w1 x1 + w2 x2 + w3 x3 + b). The weights say how much each input matters, and they are what the network learns.`,
+   `The simplest network with one neuron is called a **perceptron**. On its own it can only draw a straight dividing line, but stacking neurons in layers lets the network learn very complex shapes.`], d:['nn_neuron']},
+  {h:'2. Layers and the forward pass', p:[
+   `A network is arranged in **layers**. The **input layer** receives the features. One or more **hidden layers** transform them. The **output layer** gives the answer. A network with many hidden layers is called **deep**, which is where the term deep learning comes from.`,
+   `In a **dense** (fully connected) layer every neuron connects to every neuron in the next layer. Sending data from input to output is the **forward pass**. Each layer is essentially a matrix multiplication followed by an activation, which is why GPUs, which excel at parallel matrix maths, speed training up so much.`], d:['nn_net']},
+  {h:'3. Activation functions', p:[
+   `Without activation functions a stack of layers would collapse into one straight-line model. The activation adds **non-linearity**, which lets the network learn curves and complex patterns.`,
+   `**ReLU** outputs max(0, x). It is fast and the default choice for hidden layers. **Sigmoid** squashes any number into the range 0 to 1, useful for a yes/no output. **Softmax** turns a set of scores into probabilities that add up to 1, used in the last layer for multi-class problems such as choosing among ten digits.`], d:['nn_act']},
+  {h:'4. How a network learns', p:[
+   `The **loss function** measures how wrong the predictions are. Regression often uses mean squared error and classification uses **cross-entropy**. Training tries to make the loss as small as possible.`,
+   `**Backpropagation** works out how much each weight contributed to the error by passing the error backwards through the layers using the chain rule from calculus. **Gradient descent** (or a smarter version such as **Adam**) then nudges every weight a small step in the direction that reduces the loss. The size of that step is the **learning rate**.`,
+   `Training is organised in **epochs** and **batches**. One epoch is one full pass over the training data. Because the data is too big to process at once, each epoch is divided into **batches**, and the weights are updated after every batch.`]},
+  {h:'5. Convolutional neural networks (CNNs)', p:[
+   `Images have thousands of pixels, and connecting every pixel to every neuron would need far too many weights. A **CNN** solves this with **convolution**: a small **filter**, for example 3 by 3 pixels, slides across the image and detects a local pattern such as an edge. Early layers find edges, middle layers find shapes, and later layers find whole objects like wheels or faces.`,
+   `**Pooling** shrinks the feature maps, usually by keeping the strongest value in each small region, which makes the network faster and less sensitive to small shifts. At the end, dense layers and a softmax produce the class probabilities.`], d:['nn_cnn']},
+  {h:'6. Sequences: RNNs, LSTMs and transformers', p:[
+   `Some data has an order: sentences, speech, sensor readings. A **recurrent neural network (RNN)** passes a memory from one step to the next. An **LSTM** is an improved RNN that can hold on to important information for longer, which suits forecasting and speech tasks.`,
+   `Modern language models use **transformers**, which use a mechanism called **attention** to let every word look at every other word at once. Transformers power chatbots and translation tools.`]},
+  {h:'7. Making training work', p:[
+   `Neural networks overfit easily. **Dropout** randomly switches off some neurons during training so the network cannot rely on any single one. **Early stopping** ends training when the validation loss stops improving. **Data augmentation** creates extra training images by flipping, rotating or brightening the originals.`,
+   `**Transfer learning** starts from a model already trained on millions of images and fine-tunes it on your small dataset. For student projects this is often the best approach because it gives strong results with little data and little computing power.`]},
+  {h:'8. Frameworks', p:[
+   `You rarely code networks from scratch. **Keras** (part of TensorFlow) is beginner friendly. **PyTorch** is very popular for research and gives more control. Free GPUs are available on Google Colab, so you do not need special hardware to start.`]}
+ ],
+ defs: [['Neuron','A unit that computes a weighted sum of inputs and applies an activation function.'],['Weight','A learned number that says how strongly one input influences a neuron.'],['Bias','A learned offset added before the activation.'],['Activation function','A non-linear function such as ReLU that follows the weighted sum.'],['Layer','A group of neurons that process data at the same stage.'],['Loss function','A measure of how wrong the model is.'],['Backpropagation','The method for computing how each weight affects the loss.'],['Learning rate','The size of each weight update.'],['Epoch','One full pass through the training data.'],['Batch','A subset of samples processed before one weight update.'],['Convolution','Sliding a small filter over an image to detect local patterns.'],['Pooling','Shrinking feature maps by summarising small regions.'],['Dropout','Randomly disabling neurons during training to reduce overfitting.'],['Transfer learning','Reusing a pretrained model for a new task.']],
+ code: {t:'Worked example: recognising handwritten digits with Keras', c:`from tensorflow import keras
+
+(X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
+X_train, X_test = X_train / 255.0, X_test / 255.0     # scale pixels to 0-1
+
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(28, 28)),
+    keras.layers.Dense(128, activation="relu"),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(10, activation="softmax"),
+])
+model.compile(optimizer="adam",
+              loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
+
+model.fit(X_train, y_train, epochs=5, validation_split=0.1)
+print(model.evaluate(X_test, y_test))`},
+ mistakes: ['Feeding raw pixel values (0 to 255) without scaling.','Using a huge network on a tiny dataset and overfitting.','Setting the learning rate too high so the loss jumps around.','Training for too many epochs without watching validation loss.','Building from scratch when transfer learning would work better.'],
+ take: ['A neuron is a weighted sum plus an activation.','Layers of neurons learn complex patterns; activations add non-linearity.','Training uses a loss, backpropagation and gradient descent.','CNNs find patterns in images using filters and pooling.','Dropout, early stopping, augmentation and transfer learning fight overfitting.'],
+ practice: ['Run the Keras example on Google Colab and record the test accuracy.','Change the number of neurons from 128 to 16 and then 512. What changes?','Remove the Dropout layer and compare training and validation accuracy.']
+},
+
+/* ---------------- MODULE 6 ---------------- */
+{
+ time: 'Weeks 13 to 14  |  about 8 hours',
+ intro: `A model that lives only in a notebook helps nobody. This module shows how to turn your work into something people can use: a web demo, a small API, or a program running on a tiny chip. It also covers the responsibility that comes with putting AI in front of real people.`,
+ goals: ['Save and reload a trained model','Build a simple web demo with Streamlit','Explain what an API is and why it is useful','Understand edge AI, TinyML and quantisation','Explain model drift and why monitoring matters','Apply basic ideas of fairness, privacy and explainability','Present a project on GitHub'],
+ sections: [
+  {h:'1. From notebook to product', p:[
+   `Training is only half of the job. **Inference** means using a trained model to make predictions on new data. To ship a model you save it, wrap it in an application, let users reach it, and then watch how it behaves. If accuracy drops, you retrain and release a new version. This cycle is often called **MLOps**.`], d:['dp_pipe']},
+  {h:'2. Saving and loading a model', p:[
+   `After training, write the model to a file with [[joblib.dump(model, "model.joblib")]] and load it later with [[joblib.load]]. Neural networks have their own formats, such as [[model.save("model.keras")]]. Always save the preprocessing steps too, such as the scaler and the encoder, because new data must be prepared in exactly the same way as the training data.`]},
+  {h:'3. A web demo with Streamlit', p:[
+   `**Streamlit** turns a Python script into a web page. You add input widgets like number boxes and sliders, call your model, and show the result. It is perfect for project exhibitions because your teachers and friends can try the model without installing anything.`,
+   `If other programs need to use your model, wrap it in an **API** (application programming interface) with a framework like **FastAPI** or **Flask**. A client sends data to a web address, your model predicts, and the API sends the answer back as JSON.`]},
+  {h:'4. Edge AI and TinyML', p:[
+   `Sending every sensor reading to the cloud costs bandwidth, adds **latency** (delay) and raises privacy questions. **Edge AI** runs the model on the device itself. **TinyML** is edge AI on microcontrollers such as the ESP32 or Arduino, which have only kilobytes of memory and run on a battery.`,
+   `To fit a model on such a chip you shrink it. **Quantisation** stores weights as 8-bit integers instead of 32-bit decimals, cutting size to about a quarter with a small loss in accuracy. **Pruning** removes weights that contribute little. Tools like TensorFlow Lite Micro and Edge Impulse help with the conversion. Typical uses are keyword spotting, vibration monitoring on motors and gesture recognition.`], d:['dp_edge']},
+  {h:'5. Monitoring and model drift', p:[
+   `The real world changes. A crack detector trained in summer photos may struggle with monsoon photos, and a load forecast trained before a new factory opened will be off. This is **model drift**: performance drops because incoming data no longer looks like the training data.`,
+   `Guard against drift by logging inputs and predictions, tracking accuracy on freshly labelled samples, setting an alert when it falls, and retraining on newer data.`]},
+  {h:'6. Responsible AI', p:[
+   `**Bias** enters when training data under-represents some groups. A face model trained mostly on one skin tone performs worse on others. Check performance separately for different groups, not just overall.`,
+   `**Privacy** means collecting only the data you need, removing names and other identifiers, and getting consent. **Explainability** means being able to say why a model made a decision, which builds trust. Simple models such as decision trees and linear regression are naturally explainable. **Safety and accountability** mean a human stays responsible, especially for decisions about health, safety or people's opportunities.`,
+   `A quick checklist before you release: Is the data legal and consented? Have I tested on unseen data? Do I know where the model fails? Is a human in the loop for important decisions?`]},
+  {h:'7. Sharing your work', p:[
+   `Put your project on **GitHub**, a service that stores code and tracks every change with **Git**. Include a clear **README** that states the problem, the dataset, the method, the results and how to run the code. List the libraries in **requirements.txt** so anyone can recreate your environment with [[pip install -r requirements.txt]]. A short demo video and a results table make a strong project report.`]}
+ ],
+ defs: [['Inference','Using a trained model to make predictions.'],['Deployment','Making a model available for real users.'],['API','A way for one program to send requests to another and get answers.'],['Latency','The time a system takes to respond.'],['Edge AI','Running AI models on the device where data is collected.'],['TinyML','Machine learning on very small, low-power microcontrollers.'],['Quantisation','Storing model numbers with lower precision to shrink the model.'],['Pruning','Removing unimportant weights from a model.'],['Model drift','Loss of accuracy because real-world data changes over time.'],['Bias','Systematic unfairness in a model, often inherited from the data.'],['Explainability','The ability to describe why a model made a prediction.'],['Git','A tool that tracks changes to code.'],['requirements.txt','A file that lists the libraries a project needs.']],
+ code: {t:'Worked example: save a model and serve it with Streamlit', c:`# --- after training ---
+import joblib
+joblib.dump(model, "model.joblib")
+
+# --- app.py ---
+import streamlit as st
+import joblib
+
+model = joblib.load("model.joblib")
+
+st.title("Concrete strength predictor")
+cement = st.number_input("Cement (kg/m3)", 100, 600, 300)
+water = st.number_input("Water (kg/m3)", 100, 250, 180)
+age = st.slider("Age (days)", 1, 365, 28)
+
+if st.button("Predict"):
+    pred = model.predict([[cement, water, age]])[0]
+    st.success(f"Predicted strength: {pred:.1f} MPa")
+
+# run in the terminal with:  streamlit run app.py`},
+ mistakes: ['Saving the model but forgetting the scaler or encoder.','Never testing the app with data that looks different from the training set.','Releasing without monitoring, then not noticing the model got worse.','Collecting personal data you do not need.','Publishing code without a README or a requirements file.'],
+ take: ['Shipping means save, serve, use, monitor and retrain.','Streamlit makes demos easy, and APIs let other programs call your model.','TinyML runs small models on microcontrollers using quantisation and pruning.','Models drift, so monitor them.','Fairness, privacy and explainability are part of the job.'],
+ practice: ['Turn your best project model into a Streamlit page and share a screenshot.','Write a README for it with problem, data, method, results and run steps.','Make a list of three groups your model might treat unfairly and how you would test for it.']
+}
+];
+
+/* ============================ LESSON RENDERER ============================ */
+const fmt = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[\[(.+?)\]\]/g, '<code>$1</code>');
+let curLesson = 0;
+function openLesson(i){
+  curLesson = i;
+  const L = LESSONS[i], M = MODULES[i];
+  let toc = '<nav class="toc" aria-label="On this page">' + L.sections.map((s, k) => '<button data-s="s'+k+'">'+esc(s.h.replace(/^\d+\.\s*/, ''))+'</button>').join('') + '<button data-s="sdefs">Definitions</button><button data-s="scode">Code</button><button data-s="stake">Summary</button></nav>';
+  let h = '<button class="btn plain" id="lbBack">Back to roadmap</button>' +
+    '<p class="small" style="margin:16px 0 4px">Module ' + (i+1) + ' of ' + MODULES.length + '  |  ' + esc(L.time) + '</p>' +
+    '<h2 style="color:var(--navy);font-size:clamp(1.6rem,4vw,2.3rem)">' + esc(M.t) + '</h2>' +
+    '<p class="lead" style="margin-top:12px">' + fmt(L.intro) + '</p>' +
+    '<div class="callout"><b>By the end of this module you can:</b><ul>' + L.goals.map(g => '<li>' + esc(g) + '</li>').join('') + '</ul></div>' + toc;
+  L.sections.forEach((s, k) => {
+    h += '<section class="lsec" id="s'+k+'"><h3>' + esc(s.h) + '</h3>' + s.p.map(p => '<p>' + fmt(p) + '</p>').join('') + (s.d || []).map(d => DG[d]()).join('') + '</section>';
+  });
+  h += '<section class="lsec" id="sdefs"><h3>Key definitions</h3><dl class="defs">' + L.defs.map(d => '<dt>' + esc(d[0]) + '</dt><dd>' + esc(d[1]) + '</dd>').join('') + '</dl></section>';
+  h += '<section class="lsec" id="scode"><h3>' + esc(L.code.t) + '</h3><pre><code>' + esc(L.code.c) + '</code></pre></section>';
+  h += '<section class="lsec"><h3>Common mistakes</h3><div class="callout bad"><ul>' + L.mistakes.map(m => '<li>' + esc(m) + '</li>').join('') + '</ul></div></section>';
+  h += '<section class="lsec" id="stake"><h3>Key takeaways</h3><div class="callout ok"><ul>' + L.take.map(m => '<li>' + esc(m) + '</li>').join('') + '</ul></div></section>';
+  h += '<section class="lsec"><h3>Try it yourself</h3><ul>' + L.practice.map(m => '<li>' + esc(m) + '</li>').join('') + '</ul></section>';
+  h += '<div class="pager"><button class="btn navy" id="lbQuiz">Take the module quiz</button><button class="btn plain" id="lbDone"></button></div>' +
+    '<div class="pager">' + (i > 0 ? '<button class="btn plain" id="lbPrev">Previous module</button>' : '<span></span>') + (i < LESSONS.length - 1 ? '<button class="btn plain" id="lbNext">Next module</button>' : '<span></span>') + '</div>';
+  $('lessonArea').innerHTML = h;
+  go('lesson');
+  const setDone = () => { $('lbDone').textContent = done.has(i) ? 'Marked as done (tap to undo)' : 'Mark module as done'; };
+  setDone();
+  $('lbBack').onclick = () => { go('learn'); $('roadmap').scrollIntoView(); };
+  $('lbQuiz').onclick = () => startQuiz(Object.keys(QUIZ)[i]);
+  $('lbDone').onclick = () => { done.has(i) ? done.delete(i) : done.add(i); saveProgress(); renderRoad(); setDone(); };
+  if ($('lbPrev')) $('lbPrev').onclick = () => openLesson(i - 1);
+  if ($('lbNext')) $('lbNext').onclick = () => openLesson(i + 1);
+  $('lessonArea').querySelectorAll('.toc button').forEach(b => b.onclick = () => $(b.dataset.s).scrollIntoView({behavior:'smooth', block:'start'}));
+}
+
+/* ============================ PROJECTS ============================ */
+const BRANCHES = ['Civil','Electrical','Electronics & Telecom','Computer Science','Mechanical'];
+const PROJECTS = [
+  // Civil
+  {b:0, lv:'Beginner', t:'Predict concrete strength', d:'Estimate compressive strength from cement, water, ash and age of a concrete mix.', data:'UCI Concrete Compressive Strength dataset', tools:'Python, Pandas, scikit-learn', s:['Load the CSV and check for missing values','Plot strength against water-cement ratio','Train linear regression and a random forest','Compare errors and explain which mix factor matters most']},
+  {b:0, lv:'Intermediate', t:'Crack detection in concrete', d:'Classify photos of walls and slabs as cracked or not cracked.', data:'SDNET2018 concrete crack images', tools:'Python, Keras or PyTorch', s:['Resize and label the images','Augment with flips and brightness changes','Train a small CNN','Test on photos you take around campus']},
+  {b:0, lv:'Advanced', t:'Traffic density from CCTV', d:'Count vehicles on a road from video and forecast peak hours.', data:'Your own campus-gate video or open traffic clips', tools:'Python, OpenCV, YOLO', s:['Detect vehicles frame by frame','Count vehicles crossing a line','Log counts per 5 minutes','Forecast the busiest hour']},
+  // Electrical
+  {b:1, lv:'Beginner', t:'Household load forecasting', d:'Predict electricity use for the next hour from past usage and time of day.', data:'UCI Individual Household Electric Power Consumption', tools:'Python, Pandas, scikit-learn', s:['Resample data to hourly','Add hour and weekday as features','Train a regression model','Avoid leaking future values into the features']},
+  {b:1, lv:'Intermediate', t:'Transformer fault classifier', d:'Classify fault type from dissolved gas analysis readings.', data:'Published DGA datasets (IEC TC10 style)', tools:'Python, scikit-learn', s:['Normalise gas concentrations','Train decision tree and SVM','Read the confusion matrix','Tune with cross-validation']},
+  {b:1, lv:'Advanced', t:'Solar power output predictor', d:'Predict panel output from irradiance, temperature and cloud cover.', data:'Open PV plant datasets or a small panel with a logger', tools:'Python, Keras, ESP32 sensors', s:['Log irradiance and voltage','Clean out night-time readings','Train an LSTM or gradient boosting model','Show predicted vs actual on a live chart']},
+  // E&TC
+  {b:2, lv:'Beginner', t:'Sensor anomaly alarm', d:'Flag unusual temperature or vibration readings from an ESP32 sensor.', data:'Readings you log yourself', tools:'ESP32, Arduino IDE, Python', s:['Log a day of normal readings','Compute mean and standard deviation','Flag readings beyond 3 standard deviations','Trigger a buzzer or LED']},
+  {b:2, lv:'Intermediate', t:'Keyword spotting with TinyML', d:'Recognise words like "on" and "off" on a microcontroller.', data:'Google Speech Commands', tools:'TensorFlow Lite Micro, Edge Impulse', s:['Turn audio into spectrograms','Train a small CNN','Quantise the model to 8-bit','Deploy and test on the board']},
+  {b:2, lv:'Advanced', t:'Modulation recognition', d:'Identify BPSK, QPSK and 16-QAM from received signal samples.', data:'RadioML 2016.10A', tools:'Python, NumPy, PyTorch', s:['Load I/Q samples','Extract constellation or FFT features','Train a classifier','Plot accuracy against noise level']},
+  // Computer
+  {b:3, lv:'Beginner', t:'SMS spam classifier', d:'Decide if a message is spam using its words.', data:'UCI SMS Spam Collection', tools:'Python, scikit-learn', s:['Clean and tokenise text','Convert to TF-IDF features','Train Naive Bayes','Wrap it in a Streamlit page']},
+  {b:3, lv:'Intermediate', t:'Student result predictor', d:'Predict pass or fail from attendance, marks and study habits.', data:'UCI Student Performance', tools:'Python, Pandas, scikit-learn', s:['Encode categorical columns','Train logistic regression and a tree','Compare precision and recall','Discuss fairness of using such a model']},
+  {b:3, lv:'Advanced', t:'Real-time object detector', d:'Detect helmets or masks from a webcam feed.', data:'Open helmet or mask detection datasets on Roboflow', tools:'Python, OpenCV, YOLO', s:['Label or import images','Fine-tune a YOLO model','Run on the webcam','Measure frames per second']},
+  // Mechanical
+  {b:4, lv:'Beginner', t:'Bearing fault detection', d:'Tell healthy bearings from faulty ones using vibration data.', data:'CWRU Bearing Data Center', tools:'Python, NumPy, scikit-learn', s:['Split signals into windows','Compute RMS and FFT features','Train a random forest','Report recall for the fault class']},
+  {b:4, lv:'Intermediate', t:'Tool wear prediction', d:'Predict flank wear on a milling tool from force and vibration.', data:'NASA milling wear dataset', tools:'Python, Pandas, scikit-learn', s:['Merge sensor files per run','Engineer features per cut','Train a regression model','Plot predicted wear against real wear']},
+  {b:4, lv:'Advanced', t:'Surface defect inspection', d:'Find scratches and inclusions on steel surface images.', data:'NEU surface defect database', tools:'Python, PyTorch', s:['Prepare the six defect classes','Train a CNN with augmentation','Visualise where the model looks','Set a reject threshold for a production line']}
+];
+let branchFilter = -1;
+function renderProjects(){
+  $('chips').innerHTML = ['All'].concat(BRANCHES).map((n,i) =>
+    '<button class="chip" aria-pressed="'+(branchFilter === i-1)+'" data-i="'+(i-1)+'">'+esc(n)+'</button>').join('');
+  $('chips').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { branchFilter = +b.dataset.i; renderProjects(); }));
+  $('projGrid').innerHTML = PROJECTS.filter(p => branchFilter < 0 || p.b === branchFilter).map(p =>
+    '<article class="card"><div><span class="tag">'+esc(BRANCHES[p.b])+'</span><span class="tag lvl">'+p.lv+'</span></div>'+
+    '<h3 style="margin-top:10px">'+esc(p.t)+'</h3><p>'+esc(p.d)+'</p>'+
+    '<p class="small"><b>Data:</b> '+esc(p.data)+'<br><b>Tools:</b> '+esc(p.tools)+'</p>'+
+    '<details><summary>Steps to follow</summary><ol>'+p.s.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol></details></article>').join('');
+}
+
+/* ============================ QUIZ ============================ */
+/* Each row: [question, CORRECT answer, wrong 1, wrong 2, wrong 3, reason]. Options are shuffled when shown. */
+const mk = rows => rows.map(r => ({q:r[0], o:[r[1],r[2],r[3],r[4]], w:r[5]}));
+const QUIZ = {
+'Module 1: Python for problem solving': mk([
+ ['Which of these creates a list in Python?','[1, 2, 3]','(1, 2, 3)','{1, 2, 3}','<1, 2, 3>','Square brackets make a list. Round brackets make a tuple.'],
+ ['What does len("AI") return?','2','1','"AI"','0','len counts the characters in the string.'],
+ ['Which keyword defines a function?','def','func','function','define','Python uses def to start a function definition.'],
+ ['What type is {"a": 1}?','dict','list','tuple','set','Curly brackets with key: value pairs make a dictionary.'],
+ ['What does range(3) produce?','0, 1, 2','1, 2, 3','0, 1, 2, 3','3 only','range starts at 0 and stops before the number given.'],
+ ['Which loop repeats while a condition stays true?','while','for each','repeat','loop','A while loop checks its condition before every pass.'],
+ ['What is the index of the first item in a list?','0','1','-1','first','Python counts from zero.'],
+ ['Which symbol starts a comment?','#','//','/*','--','Everything after # on a line is ignored by Python.'],
+ ['What is 7 // 2?','3','3.5','4','2','Double slash is floor division and drops the decimal part.'],
+ ['What is 2 ** 3?','8','6','5','9','Double star means power: 2 x 2 x 2.'],
+ ['Which is the safe way to open and auto-close a file?','with open("f.txt") as f:','f = open("f.txt") only','file("f.txt")','read("f.txt")','with closes the file for you, even if an error happens.'],
+ ['Which method adds an item to the end of a list?','append','add','push_back','insert_end','list.append(x) adds x at the end.'],
+ ['Which call gives all keys of a dictionary d?','d.keys()','d.key()','keys(d.all)','d.list()','keys() returns the dictionary keys.'],
+ ['What does return do in a function?','Sends a value back and ends the function','Prints text on screen','Starts a loop','Deletes the function','After return runs, the function stops.'],
+ ['What does [x*x for x in range(4)] give?','[0, 1, 4, 9]','[1, 4, 9, 16]','[0, 2, 4, 6]','[0, 1, 2, 3]','It squares 0, 1, 2 and 3.'],
+ ['Which of these cannot be changed after creation?','tuple','list','dict','set','Tuples are immutable.'],
+ ['How do you convert the text "5" to an integer?','int("5")','str("5")','float("5")','num("5")','int() converts text to a whole number.'],
+ ['What does "ai".upper() return?','"AI"','"ai"','"Ai"','Error','upper() makes every letter capital.'],
+ ['Which block handles errors without crashing?','try / except','if / else','for / in','def / return','try runs the code and except catches errors.'],
+ ['Which command installs a library such as pandas?','pip install pandas','python get pandas','install.pandas()','import install pandas','pip is Python\'s package installer.']
+]),
+'Module 2: Maths you need, in plain terms': mk([
+ ['What is the mean of 2, 4 and 6?','4','6','2','12','Add them (12) and divide by 3.'],
+ ['What is the median of 1, 3 and 9?','3','4.3','9','1','The median is the middle value when sorted.'],
+ ['Variance measures:','How spread out data is around the mean','The largest value','The number of rows','The middle value','Bigger variance means more spread.'],
+ ['Standard deviation is:','The square root of variance','The square of the mean','The median minus the mean','The range','It is in the same unit as the data.'],
+ ['What is the probability of heads on a fair coin?','0.5','1','0','2','Two equally likely outcomes.'],
+ ['Probability values always lie between:','0 and 1','-1 and 1','0 and 100 only','1 and 10','0 is impossible, 1 is certain.'],
+ ['What is the slope of y = 3x + 2?','3','2','5','1/3','In y = mx + c, m is the slope.'],
+ ['A gradient tells you:','The direction in which a value rises fastest','The mean of the data','The number of classes','The file size','Gradient descent moves the opposite way to reduce error.'],
+ ['What is the dot product of [1, 2] and [3, 4]?','11','7','10','14','1x3 + 2x4 = 11.'],
+ ['A 2 x 3 matrix has:','2 rows and 3 columns','3 rows and 2 columns','6 rows','2 rows and 2 columns','Matrix size is written rows x columns.'],
+ ['For independent events A and B, P(A and B) equals:','P(A) x P(B)','P(A) + P(B)','P(A) - P(B)','P(A) / P(B)','Independent probabilities multiply.'],
+ ['A normal distribution looks like a:','Bell curve','Straight line','Staircase','Zigzag','Most values sit near the mean.'],
+ ['A correlation of +1 means:','A perfect positive linear relationship','No relationship','A perfect negative relationship','Random data','Both variables rise together in a straight-line pattern.'],
+ ['What is the derivative of x squared?','2x','x','x squared','2','d/dx of x^2 is 2x.'],
+ ['An outlier is:','A value far away from the rest','The mean','A missing value','The most common value','Outliers can distort models.'],
+ ['Which is less affected by outliers?','Median','Mean','Sum','Variance','One huge value pulls the mean but barely moves the median.'],
+ ['The probabilities of all possible outcomes add up to:','1','0','100','It depends','Something must happen, so the total is 1.'],
+ ['What does transposing a matrix do?','Swaps its rows and columns','Deletes its diagonal','Doubles every value','Sorts the values','Row i becomes column i.'],
+ ['What is the distance from (0, 0) to (3, 4)?','5','7','3.5','12','sqrt(3^2 + 4^2) = 5.'],
+ ['Scaling values to the range 0 to 1 is called:','Min-max scaling','Overfitting','Clustering','Tokenising','(x - min) / (max - min) does it.']
+]),
+'Module 3: Data with NumPy and Pandas': mk([
+ ['What is the main table object in Pandas?','DataFrame','Sheet','Matrix2D','Grid','A DataFrame holds rows and columns of data.'],
+ ['What does df.head() show?','The first 5 rows','The column names only','The last 5 rows','The file path','head() is the quickest peek at your data.'],
+ ['Which function loads a CSV file?','pd.read_csv','pd.open_table','pd.load_excel','pd.csv_open','read_csv turns a CSV into a DataFrame.'],
+ ['Which line counts missing values per column?','df.isna().sum()','df.count_null()','df.missing()','df.blank()','isna marks missing cells and sum counts them.'],
+ ['Which creates a NumPy array?','np.array([1, 2, 3])','np.list(1, 2, 3)','np.make([1, 2, 3])','np.new(1, 2, 3)','np.array converts a list to an array.'],
+ ['What does df.describe() give?','Summary statistics','A chart','A trained model','A CSV file','Count, mean, std, min, quartiles and max.'],
+ ['Which method fills missing values?','fillna','fixna','replace_null_only','patch','df.fillna(value) fills gaps.'],
+ ['Which method removes repeated rows?','drop_duplicates()','remove_same()','unique_rows()','clean_all()','It keeps only the first copy of each row.'],
+ ['Matplotlib is used to:','Draw plots and charts','Train neural networks','Send email','Clean text','pyplot makes line, bar and scatter charts.'],
+ ['A scatter plot shows:','The relationship between two variables','The count of one category','Missing values','Model size','Each dot is one row of data.'],
+ ['A histogram shows:','The distribution of one variable','Two variables together','The model error only','Column names','Bars count how many values fall in each range.'],
+ ['How do you select the column "age"?','df["age"]','df.age()','df->age','df(age)','Square brackets with the name pick a column.'],
+ ['What does df[df["age"] > 18] do?','Keeps rows where age is above 18','Deletes the age column','Adds 18 to age','Sorts by age','It is a boolean filter.'],
+ ['One-hot encoding turns categories into:','0/1 columns','Long sentences','Images','Random numbers','Each category gets its own 0 or 1 column.'],
+ ['train_test_split is used to:','Divide data into training and test parts','Remove outliers','Draw a plot','Rename columns','You train on one part and test on the other.'],
+ ['A common train/test split is:','80% train and 20% test','50% train and 50% test','100% train','10% train and 90% test','80/20 or 70/30 are common choices.'],
+ ['What does np.mean(a) compute?','The average of a','The largest value','The sorted array','The array shape','mean adds the values and divides by the count.'],
+ ['An array with 3 rows and 4 columns has shape:','(3, 4)','(4, 3)','(12,)','(3, 3)','Shape is (rows, columns).'],
+ ['What does groupby do?','Groups rows to compute a summary per group','Deletes groups','Plots a histogram','Encodes labels','For example, average marks per branch.'],
+ ['Why clean data before training?','Bad data leads to a bad model','Cleaning makes files bigger','Models need typos','It is only for looks','Garbage in, garbage out.']
+]),
+'Module 4: Classic machine learning with scikit-learn': mk([
+ ['Linear regression predicts:','A number','A category','A cluster','A sentence','Its output is continuous.'],
+ ['Logistic regression is used for:','Classification','Predicting prices','Clustering','Drawing charts','Despite its name, it outputs class probabilities.'],
+ ['A decision tree makes predictions by:','Asking a series of feature-based questions','Averaging all the data','Sorting rows randomly','Drawing a curve','Each split sends a sample down a branch.'],
+ ['A random forest is:','Many decision trees combined','One very deep tree','A clustering method','A type of chart','Combining trees reduces overfitting.'],
+ ['K-nearest neighbours predicts using:','The labels of the closest training points','A straight line','A neural network','A random guess','It votes among the k nearest samples.'],
+ ['In k-means, k is:','The number of clusters','The number of features','The learning rate','The accuracy','You choose k before running it.'],
+ ['Accuracy equals:','Correct predictions / total predictions','True positives / actual positives','Errors / total','Precision + recall','It can mislead when classes are imbalanced.'],
+ ['Precision answers:','Of the items predicted positive, how many were truly positive?','How many positives did we find?','How fast is the model?','How many features are used?','High precision means few false alarms.'],
+ ['Recall answers:','Of all real positives, how many did we find?','How many predictions were positive?','How large is the model?','How clean is the data?','High recall means few missed cases.'],
+ ['The F1 score is:','The harmonic mean of precision and recall','The sum of accuracy and recall','The average of all columns','The error of regression','It balances precision and recall.'],
+ ['A confusion matrix shows:','Correct and wrong predictions per class','Training time','Feature names','Learning rate','It lists true/false positives and negatives.'],
+ ['Cross-validation:','Tests the model on several different splits','Removes outliers','Trains without data','Doubles the dataset','It gives a more reliable performance estimate.'],
+ ['Which helps reduce overfitting?','Regularisation','Training longer with the same tiny data','Adding noise labels','Removing the test set','Regularisation penalises overly complex models.'],
+ ['GridSearchCV is used to:','Try hyperparameter combinations','Draw grids','Load data','Encode text','It searches settings and scores each with cross-validation.'],
+ ['Which call trains a scikit-learn model?','model.fit(X, y)','model.train_all()','model.learn(X)','model.run(y, X)','fit learns from features X and labels y.'],
+ ['Which call makes predictions on new data?','model.predict(X_new)','model.guess(X_new)','model.fit(X_new)','model.score_new(X)','predict returns outputs for new rows.'],
+ ['MSE stands for:','Mean squared error','Maximum standard error','Median sample estimate','Mean scaled entropy','It averages squared differences between predictions and truth.'],
+ ['An R-squared close to 1 means:','The model explains most of the variation','The model is useless','The data is missing','The model is overfitted for sure','R-squared measures explained variance.'],
+ ['A support vector machine looks for:','The boundary with the largest margin','The smallest tree','The mean of the data','The most outliers','A wide margin usually generalises better.'],
+ ['Feature scaling matters most for:','Distance-based models like KNN and SVM','Decision trees only','Printing results','Reading CSV files','Distances get dominated by large-valued features.']
+]),
+'Module 5: Neural networks and deep learning': mk([
+ ['The basic unit of a neural network is a:','Neuron','Pixel','Cluster','Tree','A neuron takes inputs, weights them and applies an activation.'],
+ ['Weights in a network are:','Learned strengths of connections','Fixed by the user always','The input images','The labels','Training adjusts the weights.'],
+ ['ReLU outputs:','max(0, x)','1 / (1 + e^-x)','x squared','Always 1','Negative inputs become 0.'],
+ ['The sigmoid function outputs values between:','0 and 1','-1 and 1','0 and 100','Any number','It squashes input into 0 to 1.'],
+ ['Softmax turns scores into:','Probabilities that add up to 1','Random labels','Pixel values','Gradients','It is used in the last layer for multi-class problems.'],
+ ['A loss function measures:','How wrong the predictions are','How fast the GPU is','Data size','Number of layers','Training tries to reduce it.'],
+ ['Backpropagation:','Computes gradients so weights can be updated','Loads the dataset','Draws the network','Removes neurons for good','It sends error information backwards through layers.'],
+ ['If the learning rate is far too high, training may:','Overshoot and fail to converge','Finish instantly and perfectly','Ignore the data','Delete weights','Big steps can jump past the minimum.'],
+ ['One epoch is:','One full pass through the training data','One neuron','One image','One layer','Training usually runs many epochs.'],
+ ['A batch is:','A group of samples processed together','The whole dataset always','A type of layer','A loss value','Batches make training efficient.'],
+ ['A convolution layer:','Detects local patterns using filters','Sorts the labels','Stores the dataset','Plots graphs','Filters slide over the image finding edges and textures.'],
+ ['Pooling layers:','Shrink feature maps','Add more pixels','Create labels','Encode text','Max pooling keeps the strongest response in a region.'],
+ ['RNNs and LSTMs are designed for:','Sequences like text and time series','Only still images','Sorting numbers','Clustering','They keep a memory of earlier steps.'],
+ ['Dropout:','Randomly switches off neurons during training','Deletes the training set','Stops the program','Adds labels','It reduces overfitting.'],
+ ['Transfer learning means:','Reusing a model pretrained on a large dataset','Copying data between PCs','Training from zero every time','Converting CSV to images','You fine-tune it for your smaller task.'],
+ ['Keras is:','A high-level API for building neural networks','A data-cleaning library','A chart tool','A database','It runs on top of TensorFlow.'],
+ ['PyTorch is:','A deep learning framework','A spreadsheet','A web browser','A CSV format','It is popular in research and projects.'],
+ ['A "deep" network has:','Many hidden layers','Only one neuron','No weights','Only images','Depth means several layers stacked.'],
+ ['GPUs speed up training because they:','Do many calculations in parallel','Store more labels','Clean data','Reduce the dataset','Neural networks are mostly matrix maths that runs well in parallel.'],
+ ['Early stopping means:','Stopping when validation loss stops improving','Stopping at epoch 1 always','Deleting the model','Skipping validation','It prevents overfitting and saves time.']
+]),
+'Module 6: Ship it': mk([
+ ['Streamlit is used to:','Turn Python scripts into web apps','Train neural networks','Clean CSV files','Draw circuits','A few lines give you a shareable demo page.'],
+ ['Which can save a trained scikit-learn model to a file?','joblib.dump','print()','plt.show()','df.head()','joblib or pickle serialise the model.'],
+ ['Inference means:','Using a trained model to make predictions','Collecting data','Cleaning data','Labelling data','Training is learning. Inference is using.'],
+ ['An API lets:','Other programs send data to your model','You draw charts','You buy GPUs','You label data','For example, a Flask or FastAPI endpoint.'],
+ ['TinyML is:','Machine learning on very small microcontrollers','A tiny dataset','A small chart','A short quiz','Models run on low-power chips like the ESP32.'],
+ ['Quantisation:','Reduces number precision to shrink the model','Adds layers','Deletes data','Raises accuracy always','8-bit numbers take less memory than 32-bit.'],
+ ['Model drift means:','Accuracy drops as real-world data changes','The model moves to another PC','Training becomes faster','Labels disappear','You must monitor and retrain.'],
+ ['GitHub is mainly used for:','Version control and sharing code','Training models','Drawing circuits','Storing only images','It records changes and lets teams collaborate.'],
+ ['Bias in data can cause:','Unfair predictions for some groups','Faster training','Smaller files','Better privacy','A model learns the patterns, including unfair ones.'],
+ ['Which protects privacy in a student dataset?','Remove names and get consent','Share it publicly','Keep every detail','Email it to everyone','Collect only what you need and protect it.'],
+ ['Explainability is about:','Understanding why a model made a prediction','Making the model bigger','Faster GPUs','Cleaning columns','It builds trust in decisions.'],
+ ['Edge AI runs models:','On the device near the sensor','Only in far-away data centres','Only on paper','Only on TV','It cuts delay and bandwidth use.'],
+ ['Latency is:','The time a system takes to respond','The model size','The number of layers','The learning rate','Low latency matters for real-time uses.'],
+ ['What does requirements.txt hold?','A list of libraries the project needs','The training data','The model weights','The quiz questions','pip install -r requirements.txt sets up the same environment.'],
+ ['A virtual environment:','Keeps each project\'s packages separate','Speeds up the internet','Is a video game','Deletes Python','It avoids version clashes between projects.'],
+ ['Edge Impulse is:','A platform for building TinyML models','A programming language','A chart library','A database','It helps collect data, train and deploy to boards.'],
+ ['ESP32 is:','A low-cost microcontroller with Wi-Fi and Bluetooth','A GPU','A database','A Python library','Popular for IoT and TinyML projects.'],
+ ['Why test on fresh data before release?','To see real-world performance','To make the model slower','To delete old data','It is not needed','Only unseen data shows how it will behave.'],
+ ['After deployment you should:','Monitor accuracy and inputs over time','Never look at it again','Delete the logs','Turn off testing','Monitoring catches drift early.'],
+ ['Responsible AI focuses on:','Fairness, transparency and accountability','Only speed','Only cost','Only size','Good systems are useful and safe for people.']
+]),
+'General AI & ML': mk([
+ ['Which type of learning uses data with correct answers (labels)?','Supervised learning','Unsupervised learning','Reinforcement learning','Random learning','Supervised learning learns from labelled examples.'],
+ ['A model scores 99% on training data but 60% on new data. This is:','Overfitting','Underfitting','Normalisation','Clustering','It memorised the training data instead of learning the pattern.'],
+ ['Which task predicts a continuous number such as a price?','Regression','Classification','Clustering','Tokenising','Classification outputs categories.'],
+ ['Why keep a separate test set?','To check performance on unseen data','To speed up training','To add features','To remove outliers','The test set shows how the model behaves on new data.'],
+ ['K-means is an example of:','Unsupervised clustering','Supervised classification','Regression','Reinforcement learning','It groups unlabelled data into k clusters.'],
+ ['What does an activation function add to a neural network?','Non-linearity','More data','Faster hardware','Labels','Without it, many layers collapse into one linear model.'],
+ ['Only 2% of your data is the "fault" class. Which metric is more trustworthy than accuracy?','F1 score','Accuracy alone','Number of rows','File size','Always predicting "no fault" would get 98% accuracy.'],
+ ['Gradient descent is used to:','Adjust parameters to reduce the loss','Clean the data','Draw charts','Split data','It takes small steps that lower the error.'],
+ ['Which Python library is most used for tabular data?','Pandas','Turtle','Tkinter','Pygame','DataFrames make tables easy to handle.'],
+ ['CNNs are most commonly used for:','Images','Spreadsheets only','Sorting numbers','Sending email','Convolutions pick up edges and textures.'],
+ ['In ML, a "feature" is:','An input variable used by the model','The final answer','The model file','A type of chart','For a house price model, area and rooms are features.'],
+ ['In supervised learning, a "label" is:','The correct answer for a sample','An input column','A loss value','A layer','The model learns to predict the label.'],
+ ['Precision measures:','How many predicted positives were truly positive','How many positives were found','Training speed','Model size','It tells you how trustworthy a positive prediction is.'],
+ ['Recall measures:','How many real positives were found','How many predictions were positive','Data size','Number of layers','It tells you how many cases you missed.'],
+ ['Underfitting means the model:','Is too simple and does poorly even on training data','Memorised the data','Has too many features','Is perfect','It failed to learn the pattern.'],
+ ['Biased training data can lead to:','Unfair predictions','Faster training','Smaller files','Guaranteed accuracy','Models copy patterns in their data.'],
+ ['Which is an unsupervised task?','Grouping customers into segments','Predicting exam marks from labelled data','Spam detection with labels','Predicting house price','Segmentation has no labels.'],
+ ['An epoch is:','One full pass through the training data','One neuron','One image','One test','Training usually runs many epochs.'],
+ ['A decision tree splits data by:','Asking yes/no questions about features','Averaging all rows','Drawing circles','Sorting names','Each question separates the samples further.'],
+ ['Dropout is used to:','Reduce overfitting by randomly switching off neurons in training','Delete the dataset','Speed up the GPU','Add labels','It forces the network not to rely on single neurons.']
+]),
+'Civil': mk([
+ ['Predicting concrete compressive strength from mix ratios is a:','Regression task','Classification task','Clustering task','Translation task','Strength is a continuous number.'],
+ ['Which model type is best suited to spotting cracks in photos?','CNN','Linear regression','K-means on file names','Naive Bayes on text','CNNs are designed for image patterns.'],
+ ['Why rotate, flip and brighten crack images during training?','To add variety and reduce overfitting','To hide the data','To make files smaller','To label them','Augmentation shows more variations of the same crack.'],
+ ['Bridge sensors stream data all day. Finding unusual readings is called:','Anomaly detection','Data entry','Image resizing','Tokenising','It flags points that differ from normal behaviour.'],
+ ['Which inputs are likely to help predict concrete strength?','Water-cement ratio, cement content and age','Colour of the truck','Site manager\'s name','Date of the photo','Physical mix properties drive strength.'],
+ ['Predicting next week\'s bridge deflection from sensor history is:','Time-series forecasting','Image captioning','Clustering','Sorting','The data is ordered in time.'],
+ ['Classifying soil samples as clay, silt or sand from lab tests is:','Classification','Regression','Compression','Sampling','The output is a category.'],
+ ['Marking exactly which pixels of a photo are cracked is called:','Segmentation','Regression','Clustering','Scaling','Segmentation labels each pixel.'],
+ ['Supervised crack detection needs:','Images with crack / no-crack labels','Only unlabelled images','Only text','Only sensors','Labels tell the model the right answer.'],
+ ['Counting vehicles in CCTV video uses:','Object detection','Linear regression on names','Sorting','Encryption','Detection finds and locates objects in a frame.'],
+ ['Predicting river level from rainfall data is:','Regression','Classification of images','Text mining','Tokenising','The target is a number.'],
+ ['A phone accelerometer can help find potholes because:','Bumps create vibration patterns','It measures cement','It sees colours','It reads signs','Vibration signatures can be learned.'],
+ ['Estimating construction cost from area, floors and location is:','Regression','Clustering','Segmentation','Translation','Cost is a continuous target.'],
+ ['Grouping similar soil samples without labels is:','Clustering','Classification','Regression','Labelling','Clustering finds natural groups.'],
+ ['A crack model has 98% training accuracy but fails on photos from a new site. This is:','Overfitting','Underfitting','Perfect fit','Normalisation','It did not generalise.'],
+ ['If photos of the same wall appear in both train and test sets, accuracy will look:','Too high and misleading','Too low','Exactly right','Random','This is data leakage.'],
+ ['Field sensor data often has gaps. You should:','Clean or fill the missing values','Ignore them','Delete the sensor','Train immediately','Missing data harms models.'],
+ ['Structural health monitoring means:','Continuously watching sensors to detect damage','Painting the structure','Buying steel','Counting workers','ML can flag early warning signs.'],
+ ['Missing a crack is costly. Which metric matters most?','Recall','Accuracy only','File size','Epoch count','Recall shows how many real cracks you found.'],
+ ['Satellite images sorted into water, forest and buildings is:','Image classification','Regression','Sorting text','Anomaly detection only','Each image or region gets a class.']
+]),
+'Electrical': mk([
+ ['Forecasting next-hour electricity demand is best described as:','Time-series regression','Image classification','Clustering','Text mining','It predicts a number from time-ordered data.'],
+ ['Why scale features like voltage (V) and current (mA)?','Large ranges can dominate the learning','It makes data secret','It adds labels','It removes time','Scaling puts features on comparable ranges.'],
+ ['Sorting transformer readings into fault types is:','Classification','Regression','Compression','Sampling','The output is a category.'],
+ ['Which is a data leakage mistake in load forecasting?','Using tomorrow\'s load as a feature','Using yesterday\'s load','Using the hour of day','Using a temperature forecast','Tomorrow\'s load is unknown at prediction time.'],
+ ['Smart meter data can be used to:','Forecast consumption and spot unusual usage','Design a turbine blade','Paint a pole','Route trains','Meters give rich time-stamped data.'],
+ ['Detecting electricity theft from odd meter patterns is:','Anomaly detection','Image segmentation','Translation','Sorting','Theft shows up as unusual patterns.'],
+ ['Solar panel output depends mainly on:','Irradiance and temperature','Panel colour name','Owner\'s name','Wire length only','Sunlight and heat are key inputs.'],
+ ['Why add hour-of-day as a feature?','Demand follows a daily cycle','It is required by law','It removes noise','It adds labels','Time features capture daily patterns.'],
+ ['Predicting motor failure from current and vibration is:','Predictive maintenance','Image editing','Web design','Data entry','Sensors show early signs of wear.'],
+ ['Which metric reports forecast error in kW?','Mean absolute error (MAE)','Recall','F1 score','Confusion matrix','MAE is in the same unit as the target.'],
+ ['For a load forecast, you should split train and test:','By time, past for training and future for testing','Randomly','By alphabetical order','By file size','Random splits leak future information.'],
+ ['Classifying a line fault as short-circuit or open-circuit needs:','Labelled fault examples','Only unlabelled data','No data','Only images','Supervised classification needs labels.'],
+ ['Which input is most useful for wind power forecasting?','Wind speed','Tower colour','Operator name','Cable brand','Power rises steeply with wind speed.'],
+ ['Estimating battery state-of-charge from voltage and current is:','Regression','Clustering','Segmentation','Tokenising','The target is a number.'],
+ ['Missing readings in load data can be handled by:','Interpolating or filling them','Ignoring the gaps','Training with blanks','Deleting the meter','Filling gaps keeps the time series usable.'],
+ ['Harmonic analysis of a current waveform uses:','FFT','Sorting','Tokenising','Bubble sort','FFT shows the frequency content.'],
+ ['Demand response in a smart grid means:','Shifting usage away from peak hours','Cutting all power','Buying more coal','Painting meters','Forecasts help plan the shift.'],
+ ['Why choose an LSTM for load forecasting?','It remembers patterns across time steps','It draws charts','It cleans data','It reduces voltage','LSTMs suit sequences.'],
+ ['A load model is great on past data but poor next week. This suggests:','Overfitting','Underfitting','Perfect fit','Too much scaling','It did not generalise.'],
+ ['Why is forecasting important for renewables?','Output varies and the grid must stay balanced','It makes panels bigger','It removes clouds','It is for decoration','Good forecasts help schedule other sources.']
+]),
+'Electronics & Telecom': mk([
+ ['TinyML models are designed to run on:','Microcontrollers with little memory','Supercomputers only','Cloud servers only','Printers','TinyML brings small models to low-power devices.'],
+ ['What does 8-bit quantisation do?','Reduces number precision to shrink the model','Adds more layers','Deletes training data','Raises the voltage','Smaller numbers mean a smaller, faster model.'],
+ ['Deciding whether a signal is BPSK or QPSK is:','Classification','Regression','Sorting','Encryption','Each modulation type is a class.'],
+ ['Spectrograms and FFT outputs are used for:','Extracting features from signals and audio','Printing reports','Hiding data','Naming files','They turn time signals into frequency patterns.'],
+ ['Noise in a signal is:','Unwanted random disturbance','The wanted message','A type of antenna','A filter','Noise makes signals harder to classify.'],
+ ['SNR stands for:','Signal-to-noise ratio','Sample number rate','Serial network route','Sensor noise resistance','Higher SNR means a cleaner signal.'],
+ ['The ESP32 board includes:','Wi-Fi and Bluetooth','A large GPU','A hard disk','A screen','That makes it popular for IoT projects.'],
+ ['To sample a signal without losing information, the sampling rate must be:','At least twice the highest frequency','Half the highest frequency','Exactly 1 Hz','Random','This is the Nyquist rule.'],
+ ['Edge computing reduces:','Latency and bandwidth use','Battery size','Antenna gain','Resistor value','Processing near the sensor avoids sending everything to the cloud.'],
+ ['MFCC features are commonly used in:','Speech recognition','Bridge design','Motor control','Soldering','They summarise how humans hear sound.'],
+ ['Spotting unusual patterns in network traffic is:','Anomaly detection','Image resizing','Regression of price','Clustering only pictures','It can reveal faults or attacks.'],
+ ['RadioML data is made of:','I/Q signal samples','Photos','Text messages','Videos','I and Q are the in-phase and quadrature parts.'],
+ ['Why keep models small on a microcontroller?','RAM and flash memory are limited','Small models are always more accurate','Compilers need it','It saves paper','Limited memory sets a hard size limit.'],
+ ['Channel estimation means:','Estimating how the channel distorts the signal','Choosing a TV channel','Counting antennas','Measuring resistance','Receivers use it to undo the distortion.'],
+ ['Sensor calibration is:','Correcting readings against a known reference','Painting the sensor','Making it smaller','Connecting to Wi-Fi','Calibrated data gives better models.'],
+ ['A denoising autoencoder learns to:','Remove noise from signals','Add noise','Print circuits','Sort labels','It reconstructs clean signals from noisy ones.'],
+ ['Which is an unsupervised task?','Clustering devices by behaviour','Classifying labelled modulation types','Predicting labelled faults','Spam detection with labels','No labels are needed for clustering.'],
+ ['A spectrogram has axes of:','Time and frequency','Voltage and current only','Name and age','Rows and columns of text','Colour shows the signal strength.'],
+ ['An IoT device typically:','Collects and sends sensor data','Trains giant models','Prints paper','Makes concrete','It connects the physical world to software.'],
+ ['A wake-word detector must be:','Low power and always listening','Very large','Offline never','Used once a year','Battery devices need efficient models.']
+]),
+'Computer Science': mk([
+ ['A classic quick baseline for spam filtering is:','Naive Bayes','Bubble sort','DNS lookup','Paint','It works well on word counts and trains fast.'],
+ ['A confusion matrix shows:','Correct and wrong predictions per class','Model file size','Training time','Number of GPUs','It lists true and false positives and negatives.'],
+ ['Cross-validation is used to:','Estimate performance more reliably','Delete outliers','Speed up the internet','Add labels','It tests on several splits of the data.'],
+ ['Which of these is a hyperparameter?','Learning rate','A row of data','A label','A file name','Hyperparameters are set before training.'],
+ ['Tokenisation means:','Splitting text into words or pieces','Encrypting text','Drawing text','Deleting text','It is the first step in many NLP pipelines.'],
+ ['TF-IDF gives:','Higher weight to important, less common words','A picture of text','Sorted names','Passwords','It reduces the weight of very common words.'],
+ ['Large language models are trained to:','Predict and generate text','Draw circuits','Sort numbers only','Store files','They learn patterns from huge amounts of text.'],
+ ['Which of these is NOT machine learning?','A program with fixed if-else rules written by hand','A spam filter trained on examples','A model learning from data','A neural network','ML learns rules from data instead of hand-coding them.'],
+ ['A very deep decision tree tends to:','Memorise the training data','Underfit always','Ignore features','Run slower on nothing','Limit depth to avoid overfitting.'],
+ ['Which library can serve a model behind a web API?','FastAPI or Flask','Matplotlib','Turtle','Pygame','They expose an endpoint that returns predictions.'],
+ ['Git is used for:','Version control','Training models','Editing images','Drawing charts','It tracks changes to code.'],
+ ['Telling cats from dogs in photos is best done with:','A CNN','A linear regression on names','K-means on file size','A spreadsheet','CNNs learn visual features.'],
+ ['A recommender system:','Suggests items based on user behaviour','Sorts files','Compresses images','Edits videos','Think of movie or product suggestions.'],
+ ['Sentiment analysis is:','Detecting whether text is positive or negative','Counting pages','Translating code','Compressing text','It is a classic NLP classification task.'],
+ ['Which is a supervised task?','Spam detection trained on labelled emails','Grouping unlabelled customers','Reducing dimensions','Finding random patterns','Labelled emails teach the model the answer.'],
+ ['Fraud is rare in a dataset. Which metrics should you watch?','Precision and recall','Accuracy only','File size','Epoch count','Accuracy hides missed fraud.'],
+ ['If a face dataset lacks some groups, the model may:','Perform worse on those groups','Perform better on them','Be perfectly fair','Ignore faces','Missing groups means missing patterns.'],
+ ['Which data structure is common for tabular data in Python?','DataFrame','Stack only','Queue only','Tree only','Pandas DataFrames hold rows and columns.'],
+ ['In an LLM, a prompt is:','The input instruction or text you give it','Its weights','Its loss','Its dataset','Better prompts usually give better answers.'],
+ ['An LLM "hallucination" is:','Confident but incorrect output','A screen glitch','A slow reply','A syntax error','Always verify important answers.']
+]),
+'Mechanical': mk([
+ ['Predictive maintenance aims to:','Predict failure before it happens','Replace every part yearly','Cool the machine','Reduce paperwork','It uses sensor data to schedule repairs just in time.'],
+ ['Bearing vibration signals are often converted with:','FFT to get frequency features','A sort function','A print command','A copy command','Faults show up as characteristic frequencies.'],
+ ['Predicting tool wear in mm from cutting force is:','Regression','Classification','Clustering','Encryption','Wear is a continuous number.'],
+ ['Failures are rare in your data. What helps?','Resampling and checking recall and F1','Ignoring recall','Deleting failure rows','Using only accuracy','Rare classes need special care.'],
+ ['Which sensor is most used to record bearing vibration?','Accelerometer','Thermometer only','Light sensor','Microphone for colour','It measures acceleration of vibration.'],
+ ['The CWRU dataset contains:','Bearing vibration signals','Concrete images','Text messages','Traffic videos','It is a standard bearing-fault benchmark.'],
+ ['RUL in maintenance stands for:','Remaining useful life','Random usage level','Rotor unit load','Real unit length','Models estimate how long a part will last.'],
+ ['Which CNC data is useful for ML?','Spindle load and vibration','Operator\'s lunch time','Building colour','Weather in another city','Machine signals reflect tool condition.'],
+ ['Finding scratches on steel surface images is:','Image classification or detection','Regression on names','Sorting','Encryption','Defects are visual patterns.'],
+ ['Predicting fuel efficiency from engine specifications is:','Regression','Clustering','Segmentation','Translation','The target is a number.'],
+ ['Grouping machines by usage pattern without labels is:','Clustering','Classification','Regression','Labelling','It is unsupervised.'],
+ ['Why split a long vibration signal into windows?','To create many samples and compute features on each','To make it longer','To delete noise','To colour it','Windows turn one recording into many examples.'],
+ ['RMS of a vibration signal indicates:','Overall vibration energy','The material','The colour','The machine price','Rising RMS often signals wear.'],
+ ['A digital twin is:','A virtual replica updated with real data','A duplicate machine','A copy of a file','A type of bearing','It mirrors the state of a real asset.'],
+ ['With very few recorded failures, a model may:','Memorise them and overfit','Be perfect','Need no data','Ignore normal data','Small samples lead to poor generalisation.'],
+ ['A missed fault is very costly. Which metric matters most?','Recall','Accuracy only','File size','Epoch count','Recall shows how many real faults you caught.'],
+ ['Thermal camera images with ML can find:','Overheating spots','Bolt colour','Paint brand','Operator names','Hot spots often mean friction or electrical faults.'],
+ ['Generative design uses AI to:','Explore many designs that meet constraints','Print blueprints only','Replace materials','Tighten bolts','Engineers pick from optimised options.'],
+ ['Temperature sensor drift is:','A gradual error building up over time','A sudden crash','A type of noise-free signal','A cooling method','Drift needs recalibration.'],
+ ['The high cost of unplanned downtime is a reason for:','Predictive maintenance','Buying more paper','Bigger buildings','Removing sensors','Predicting failures avoids surprise stoppages.']
+])
+};
+const GROUPS = [
+  ['By module', Object.keys(QUIZ).filter(k => k.startsWith('Module'))],
+  ['General', ['General AI & ML']],
+  ['By branch', ['Civil','Electrical','Electronics & Telecom','Computer Science','Mechanical']]
+];
+let qs = null;
+function renderQuizMenu(){
+  qs = null;
+  $('quizArea').innerHTML = GROUPS.map(g =>
+    '<h3 style="margin:18px 0 10px;color:var(--navy)">'+g[0]+'</h3><div class="grid">'+g[1].map(k =>
+    '<div class="card"><h3>'+esc(k)+'</h3><p class="small">'+QUIZ[k].length+' questions</p><button class="btn navy" data-k="'+esc(k)+'">Start quiz</button></div>').join('')+'</div>').join('');
+  $('quizArea').querySelectorAll('button').forEach(b => b.addEventListener('click', () => startQuiz(b.dataset.k)));
+}
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function startQuiz(name){
+  go('quiz');
+  qs = {name, i:0, score:0, answered:false, order:null};
+  renderQuestion();
+}
+function renderQuestion(){
+  const set = QUIZ[qs.name], q = set[qs.i];
+  qs.order = shuffle([0,1,2,3]);
+  $('quizArea').innerHTML = '<div class="qbox"><div class="qtop"><span>'+esc(qs.name)+'</span><span>Question '+(qs.i+1)+' of '+set.length+'</span></div>'+
+    '<div class="prog" style="max-width:none;margin:0 0 14px"><i style="width:'+(qs.i/set.length*100)+'%"></i></div>'+
+    '<h3>'+esc(q.q)+'</h3><div id="opts">'+qs.order.map((oi,d)=>'<button class="opt" data-d="'+d+'">'+esc(q.o[oi])+'</button>').join('')+'</div><div id="fb"></div></div>';
+  $('opts').querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answer(+b.dataset.d)));
+}
+function answer(d){
+  if (qs.answered) return;
+  qs.answered = true;
+  const set = QUIZ[qs.name], q = set[qs.i];
+  const right = qs.order.indexOf(0);
+  if (d === right) qs.score++;
+  $('opts').querySelectorAll('.opt').forEach((b, k) => {
+    b.disabled = true;
+    if (k === right) b.classList.add('right');
+    else if (k === d) b.classList.add('wrong');
+  });
+  const last = qs.i === set.length - 1;
+  $('fb').innerHTML = '<div class="why"><b>'+(d === right ? 'Correct.' : 'Not quite.')+'</b> '+esc(q.w)+'</div><button class="btn navy" id="nextQ">'+(last ? 'See my score' : 'Next question')+'</button>';
+  $('nextQ').focus();
+  $('nextQ').addEventListener('click', () => {
+    qs.answered = false;
+    if (last) finishQuiz(); else { qs.i++; renderQuestion(); }
+  });
+}
+async function finishQuiz(){
+  const total = QUIZ[qs.name].length, pct = Math.round(qs.score / total * 100);
+  const msg = pct >= 80 ? 'Excellent work.' : pct >= 50 ? 'Good start. Review the explanations and try again.' : 'Keep going. Revisit the roadmap and retake the quiz.';
+  let saveNote = '';
+  if (user){
+    await DB.add('results', {time: new Date().toISOString(), email: user.email, name: user.name, branch: user.branch, quiz: qs.name, score: qs.score, total});
+    saveNote = '<div class="note ok">Score saved to your account.</div>';
+  } else saveNote = '<div class="note info">Sign up to save your scores. <button class="btn plain" onclick="go(\'signup\')">Sign up</button></div>';
+  $('quizArea').innerHTML = '<div class="qbox"><div class="small">'+esc(qs.name)+'</div><div class="score">'+qs.score+' / '+total+'</div><p>'+msg+'</p>'+saveNote+
+    '<button class="btn navy" onclick="startQuiz(\''+qs.name.replace(/'/g,"\\'")+'\')">Retake</button> <button class="btn plain" onclick="renderQuizMenu()">All quizzes</button></div>';
+}
+
+/* ============================ SIGN UP ============================ */
+function renderSignup(){
+  const a = $('signArea');
+  if (user){
+    $('signTitle').textContent = 'Welcome, ' + user.name;
+    $('signLead').textContent = 'You are signed in with ' + user.email + '.';
+    a.innerHTML = '<div class="note ok">'+esc(DB.label())+'</div><button class="btn navy" onclick="go(\'quiz\')">Take a quiz</button> <button class="btn plain" onclick="signOut()">Sign out</button>';
+    return;
+  }
+  $('signTitle').textContent = 'Create your account';
+  $('signLead').textContent = 'Sign up with your email to save quiz scores and track your progress.';
+  a.innerHTML = '<form id="sf" novalidate>'+
+    '<div class="f"><label for="n">Full name</label><input id="n" autocomplete="name"><div class="err" id="e-n"></div></div>'+
+    '<div class="f"><label for="m">Email</label><input id="m" type="email" autocomplete="email"><div class="err" id="e-m"></div></div>'+
+    '<div class="f"><label for="r">Roll number (optional)</label><input id="r"></div>'+
+    '<div class="f"><label for="b">Branch</label><select id="b"><option value="">Choose your branch</option>'+BRANCHES.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select><div class="err" id="e-b"></div></div>'+
+    '<div class="f"><label for="y">Year</label><select id="y"><option value="">Choose your year</option><option>1st year</option><option>2nd year</option><option>3rd year</option></select><div class="err" id="e-y"></div></div>'+
+    '<div class="f"><label class="check"><input type="checkbox" id="c"><span>I agree that IIC Cell, DRIEMS Polytechnic may store my name, email, branch and quiz scores for this learning programme.</span></label><div class="err" id="e-c"></div></div>'+
+    '<button class="btn" type="submit" id="sb">Sign up</button></form>';
+  $('sf').addEventListener('submit', onSignup);
+}
+async function onSignup(ev){
+  ev.preventDefault();
+  const v = id => $(id).value.trim();
+  const errs = {
+    n: v('n').length < 2 ? 'Enter your full name.' : '',
+    m: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('m')) ? '' : 'Enter a valid email like name@example.com.',
+    b: v('b') ? '' : 'Choose your branch.',
+    y: v('y') ? '' : 'Choose your year.',
+    c: $('c').checked ? '' : 'Please accept to continue.'
+  };
+  Object.keys(errs).forEach(k => $('e-' + k).textContent = errs[k]);
+  if (Object.values(errs).some(Boolean)) return;
+  $('sb').disabled = true; $('sb').textContent = 'Saving...';
+  const email = v('m').toLowerCase();
+  const all = await DB.list('signups');
+  const existing = all.find(s => s.email === email);
+  if (existing){ user = existing; }
+  else {
+    user = {time: new Date().toISOString(), name: v('n'), email, roll: v('r'), branch: v('b'), year: v('y')};
+    await DB.add('signups', user);
+  }
+  $('navSign').textContent = user.name.split(' ')[0];
+  renderSignup();
+  $('signArea').insertAdjacentHTML('afterbegin', '<div class="note ok">' + (existing ? 'Welcome back. You are signed in.' : 'Account created.') + '</div>');
+}
+function signOut(){ user = null; $('navSign').textContent = 'Sign up'; renderSignup(); renderRoad(); }
+
+/* ============================ ADMIN ============================ */
+function renderAdmin(){
+  $('adminArea').innerHTML = '<form id="af" style="max-width:380px"><div class="f"><label for="pc">Passcode</label><input id="pc" type="password"><div class="err" id="e-pc"></div></div><button class="btn navy" type="submit">Open dashboard</button></form>';
+  $('af').addEventListener('submit', async e => {
+    e.preventDefault();
+    if ($('pc').value !== CONFIG.ADMIN_PASSCODE){ $('e-pc').textContent = 'Incorrect passcode.'; return; }
+    const su = await DB.list('signups'), rs = await DB.list('results');
+    const tbl = (rows, cols) => rows.length ? '<div class="tscroll"><table><thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+
+      rows.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c] ?? '')+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>' : '<p class="small">No records yet.</p>';
+    $('adminArea').innerHTML = '<div class="note info">'+esc(DB.label())+'</div>'+
+      '<h3>Sign-ups ('+su.length+')</h3>'+tbl(su, ['time','name','email','roll','branch','year'])+
+      '<button class="btn plain" id="csv1">Download sign-ups CSV</button>'+
+      '<h3 style="margin-top:28px">Quiz results ('+rs.length+')</h3>'+tbl(rs, ['time','name','email','branch','quiz','score','total'])+
+      '<button class="btn plain" id="csv2">Download results CSV</button>';
+    $('csv1').onclick = () => csv(su, 'signups.csv');
+    $('csv2').onclick = () => csv(rs, 'quiz-results.csv');
+  });
+}
+function csv(rows, name){
+  if (!rows.length) return;
+  const cols = Object.keys(rows[0]);
+  const q = x => '"' + String(x ?? '').replace(/"/g, '""') + '"';
+  const text = [cols.join(',')].concat(rows.map(r => cols.map(c => q(r[c])).join(','))).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:'text/csv'}));
+  a.download = name; a.click();
+}
+
+/* ============================ INIT ============================ */
+renderRoad(); renderProjects(); loadProgress();
+document.querySelector('nav button[data-v="learn"]').setAttribute('aria-current', 'page');
+</script>
+</body>
+</html>
